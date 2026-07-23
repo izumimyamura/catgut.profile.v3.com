@@ -84,18 +84,18 @@ export default function Home() {
           <div className="standard-video-card">
             <div className="standard-video-left"><video src="/reel2.mp4" autoPlay loop muted playsInline style={{ position: 'absolute', width: '100%', height: '100%', objectFit: 'cover' }} /></div>
             <div className="standard-video-right">
-              <h3 style={{ fontSize: '2.5rem', fontWeight 800, margin: '0 0 1rem 0' }}>Cinematic Atmosphere</h3>
+              <h3 style={{ fontSize: '2.5rem', fontWeight: 800, margin: '0 0 1rem 0' }}>Cinematic Atmosphere</h3>
               <p style={{ color: '#a1a1aa', fontSize: '1.2rem', lineHeight: 1.6, marginBottom: '2rem' }}>Transforming raw footage into a moody, cinematic experience. Advanced color grading nodes mixed with environmental soundscapes.</p>
-              <a href="https://www.instagram.com/thecatguy.editz/" target="_blank" rel="noreferrer" style={{ display: 'inline-block', backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.2)', padding: '0.8rem 2rem', borderRadius: '999px', fontWeight 600, textDecoration: 'none', alignSelf: 'flex-start' }}>Watch on Instagram ↗</a>
+              <a href="https://www.instagram.com/thecatguy.editz/" target="_blank" rel="noreferrer" style={{ display: 'inline-block', backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.2)', padding: '0.8rem 2rem', borderRadius: '999px', fontWeight: 600, textDecoration: 'none', alignSelf: 'flex-start' }}>Watch on Instagram ↗</a>
             </div>
           </div>
 
           <div className="standard-video-card">
             <div className="standard-video-left"><video src="/reel3.mp4" autoPlay loop muted playsInline style={{ position: 'absolute', width: '100%', height: '100%', objectFit: 'cover' }} /></div>
             <div className="standard-video-right">
-              <h3 style={{ fontSize: '2.5rem', fontWeight 800, margin: '0 0 1rem 0' }}>Seamless Transitions</h3>
+              <h3 style={{ fontSize: '2.5rem', fontWeight: 800, margin: '0 0 1rem 0' }}>Seamless Transitions</h3>
               <p style={{ color: '#a1a1aa', fontSize: '1.2rem', lineHeight: 1.6, marginBottom: '2rem' }}>Fluid movement masking and precision keyframing to make every cut feel invisible and completely natural to the viewer.</p>
-              <a href="https://www.instagram.com/thecatguy.editz/" target="_blank" rel="noreferrer" style={{ display: 'inline-block', backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.2)', padding: '0.8rem 2rem', borderRadius: '999px', fontWeight 600, textDecoration: 'none', alignSelf: 'flex-start' }}>Watch on Instagram ↗</a>
+              <a href="https://www.instagram.com/thecatguy.editz/" target="_blank" rel="noreferrer" style={{ display: 'inline-block', backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.2)', padding: '0.8rem 2rem', borderRadius: '999px', fontWeight: 600, textDecoration: 'none', alignSelf: 'flex-start' }}>Watch on Instagram ↗</a>
             </div>
           </div>
 
@@ -162,7 +162,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 5. 3D INTERACTIVE KEYBOARD SECTION (AFTER CARD STACKS) */}
+      {/* 5. 3D INTERACTIVE KEYBOARD SECTION */}
       <KeyboardSection />
 
       {/* 6. FOOTER */}
