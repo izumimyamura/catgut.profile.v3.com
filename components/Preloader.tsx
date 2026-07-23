@@ -1,83 +1,89 @@
 'use client';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useEffect, useState } from 'react';
+
+import React, { useEffect, useState } from 'react';
 
 const GREETINGS = [
-  "வணக்கம்",     // Tamil
-  "స్వాగతం",    // Telugu
-  "ಸ್ವಾಗತ",      // Kannada
-  "స్వాగతం",    // Malayalam script variant
-  "नमस्ते",      // Hindi
-  "Welcome"     // English
+  { word: "வணக்கம்", lang: "Tamil" },
+  { word: "നമസ്കാരം", lang: "Malayalam" },
+  { word: "ನಮಸ್ಕಾರ", lang: "Kannada" },
+  { word: "నమస్కారం", lang: "Telugu" },
+  { word: "नमस्कार", lang: "Marathi" },
+  { word: "नमस्ते", lang: "Hindi" },
+  { word: "こんにちは", lang: "Japanese" },
+  { word: "Hallo", lang: "German" },
+  { word: "Bonjour", lang: "French" },
+  { word: "Hello", lang: "English" },
 ];
 
 export default function Preloader({ onComplete }: { onComplete?: () => void }) {
   const [index, setIndex] = useState(0);
-  const [isFinished, setIsFinished] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
+  const [fade, setFade] = useState(true);
 
   useEffect(() => {
     if (index < GREETINGS.length - 1) {
-      const timeout = setTimeout(() => {
-        setIndex((prev) => prev + 1);
-      }, 230);
-      return () => clearTimeout(timeout);
+      const timer = setTimeout(() => {
+        setFade(false);
+        setTimeout(() => {
+          setIndex((prev) => prev + 1);
+          setFade(true);
+        }, 50);
+      }, 220); // Smooth greeting switch
+      return () => clearTimeout(timer);
     } else {
-      const exitTimeout = setTimeout(() => {
-        setIsFinished(true);
-      }, 700);
-      return () => clearTimeout(exitTimeout);
+      // Hold on English briefly, then slide up cleanly
+      const exitTimer = setTimeout(() => {
+        setIsExiting(true);
+        setTimeout(() => {
+          if (onComplete) onComplete();
+        }, 800);
+      }, 500);
+      return () => clearTimeout(exitTimer);
     }
-  }, [index]);
+  }, [index, onComplete]);
 
   return (
-    <AnimatePresence onExitComplete={onComplete}>
-      {!isFinished && (
-        <motion.div
-          key="preloader"
-          initial={{ y: 0 }}
-          exit={{ y: '-100%' }}
-          transition={{ duration: 0.9, ease: [0.76, 0, 0.24, 1] }}
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 9999,
+        backgroundColor: '#000',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'column',
+        transform: isExiting ? 'translateY(-100vh)' : 'translateY(0)',
+        transition: 'transform 0.8s cubic-bezier(0.76, 0, 0.24, 1)',
+        pointerEvents: isExiting ? 'none' : 'auto',
+      }}
+    >
+      <div
+        style={{
+          position: 'relative',
+          overflow: 'hidden',
+          height: '80px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <p
           style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 9999,
-            backgroundColor: '#000000',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            overflow: 'hidden'
+            fontSize: 'clamp(2.2rem, 5vw, 4rem)',
+            fontWeight: 800,
+            color: '#fff',
+            margin: 0,
+            letterSpacing: '-0.02em',
+            fontFamily: 'sans-serif',
+            opacity: fade ? 1 : 0,
+            transform: fade ? 'translateY(0)' : 'translateY(20px)',
+            transition: 'opacity 0.15s ease, transform 0.15s ease',
           }}
         >
-          <div
-            style={{
-              position: 'absolute',
-              width: '320px',
-              height: '320px',
-              background: 'rgba(234, 179, 8, 0.12)',
-              filter: 'blur(120px)',
-              borderRadius: '50%'
-            }}
-          />
-
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, y: 15, filter: 'blur(8px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, y: -15, filter: 'blur(8px)' }}
-            transition={{ duration: 0.18 }}
-            style={{
-              fontSize: 'clamp(2.5rem, 7vw, 6rem)',
-              fontWeight: 800,
-              color: '#ffffff',
-              letterSpacing: '-0.03em',
-              zIndex: 10,
-              textAlign: 'center'
-            }}
-          >
-            {GREETINGS[index]}
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          • {GREETINGS[index].word}
+        </p>
+      </div>
+    </div>
   );
 }
