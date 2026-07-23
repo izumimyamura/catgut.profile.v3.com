@@ -39,7 +39,13 @@ export default function AnimatedBackground({ onLoaded }: { onLoaded?: () => void
     const frame2 = splineApp.findObjectByName("frame-2");
 
     if (!bongoCat || !frame1 || !frame2) return;
+    
+    // Position adjustments so bongo cat sits neatly on top of the keyboard
     bongoCat.visible = true;
+    if (bongoCat.position) {
+      bongoCat.position.y = 80;
+      bongoCat.position.z = 20;
+    }
 
     let i = 0;
     if (bongoIntervalRef.current) clearInterval(bongoIntervalRef.current);
@@ -52,7 +58,7 @@ export default function AnimatedBackground({ onLoaded }: { onLoaded?: () => void
         frame2.visible = true;
       }
       i++;
-    }, 120);
+    }, 130);
   };
 
   const stopBongoCat = () => {
@@ -69,7 +75,7 @@ export default function AnimatedBackground({ onLoaded }: { onLoaded?: () => void
       const keycap = splineApp.findObjectByName(skill.name);
       if (keycap) {
         gsap.to(keycap.position, {
-          y: Math.random() * 120 + 120,
+          y: Math.random() * 80 + 80,
           duration: Math.random() * 2 + 1.5,
           delay: idx * 0.08,
           repeat: -1,
@@ -90,14 +96,14 @@ export default function AnimatedBackground({ onLoaded }: { onLoaded?: () => void
     });
   };
 
-  // ScrollTriggers: Only animate and position keyboard starting at #photos & #stack
+  // ScrollTriggers: Animate and position keyboard at #photos & #stack
   useEffect(() => {
     if (!splineApp) return;
 
     const kbd = splineApp.findObjectByName("keyboard");
     if (!kbd) return;
 
-    // Start keyboard behind #photos section
+    // Set cleaner angle for photos/stack
     const photosState = getKeyboardState({ section: "photos", isMobile });
     gsap.set(kbd.scale, photosState.scale);
     gsap.set(kbd.position, photosState.position);
@@ -112,7 +118,8 @@ export default function AnimatedBackground({ onLoaded }: { onLoaded?: () => void
         const state = getKeyboardState({ section: "stack", isMobile });
         gsap.to(kbd.scale, { ...state.scale, duration: 1.2, ease: "power2.out" });
         gsap.to(kbd.position, { ...state.position, duration: 1.2, ease: "power2.out" });
-        gsap.to(kbd.rotation, { ...state.rotation, duration: 1.2, ease: "power2.out" });
+        // Clean tilt angle so keycaps and cat render cleanly
+        gsap.to(kbd.rotation, { x: 0.35, y: Math.PI / 4, z: 0, duration: 1.2, ease: "power2.out" });
       },
       onLeaveBack: () => {
         setActiveSection("photos");
