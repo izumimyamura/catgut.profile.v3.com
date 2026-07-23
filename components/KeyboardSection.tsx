@@ -5,7 +5,7 @@ import Spline from "@splinetool/react-spline";
 import { Application, SplineEvent } from "@splinetool/runtime";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SKILLS, Skill } from "../src/data/constants";
+import { SKILLS, Skill } from "../app/src/data/constants";
 
 gsap.registerPlugin(ScrollTrigger);
 
