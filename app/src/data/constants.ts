@@ -1,4 +1,13 @@
-export type SkillNames = "ae" | "davinci" | "motion" | "premiere" | "capcut" | "js" | "react" | "figma" | "node";
+export type SkillNames =
+  | "ae"
+  | "davinci"
+  | "motion"
+  | "premiere"
+  | "capcut"
+  | "js"
+  | "react"
+  | "figma"
+  | "node";
 
 export interface Skill {
   name: SkillNames;
@@ -11,12 +20,12 @@ export const SKILLS: Record<string, Skill> = {
   ae: {
     name: "ae",
     label: "Adobe After Effects",
-    shortDescription: "Industry-standard tool for motion graphics, visual effects, and animated text.",
+    shortDescription: "Industry-standard motion graphics, visual effects, and typography.",
   },
   davinci: {
     name: "davinci",
     label: "DaVinci Resolve",
-    shortDescription: "High-end color grading nodes, audio mixing, and precision video editing.",
+    shortDescription: "High-end color grading nodes, audio mixing, and precision editing.",
   },
   motion: {
     name: "motion",
@@ -31,10 +40,10 @@ export const SKILLS: Record<string, Skill> = {
   capcut: {
     name: "capcut",
     label: "CapCut",
-    shortDescription: "Accessible mobile and desktop editor packed with AI tools for rapid social edits.",
+    shortDescription: "Accessible editor packed with AI tools for rapid social edits.",
   },
   js: { name: "js", label: "JavaScript", shortDescription: "Interactive web logic and animations." },
   react: { name: "react", label: "React", shortDescription: "UI Component framework." },
   figma: { name: "figma", label: "Figma", shortDescription: "UI/UX & graphic design." },
-  node: { name: "node", label: "Node.js", shortDescription: "Backend JavaScript runtime." }
+  node: { name: "node", label: "Node.js", shortDescription: "Backend JavaScript runtime." },
 };
