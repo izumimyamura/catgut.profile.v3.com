@@ -6,7 +6,7 @@ const GREETINGS = [
   "வணக்கம்",     // Tamil
   "స్వాగతం",    // Telugu
   "ಸ್ವಾಗತ",      // Kannada
-  "స్వాగతం",    // Malayalam script / phonetic variant
+  "స్వాగతం",    // Malayalam script variant
   "नमस्ते",      // Hindi
   "Welcome"     // English
 ];
@@ -16,14 +16,12 @@ export default function Preloader({ onComplete }: { onComplete?: () => void }) {
   const [isFinished, setIsFinished] = useState(false);
 
   useEffect(() => {
-    // Cycle through greetings rapidly
     if (index < GREETINGS.length - 1) {
       const timeout = setTimeout(() => {
         setIndex((prev) => prev + 1);
-      }, 240); // speed of text transition
+      }, 230);
       return () => clearTimeout(timeout);
     } else {
-      // Pause on final greeting ("Welcome") briefly, then trigger exit
       const exitTimeout = setTimeout(() => {
         setIsFinished(true);
       }, 700);
@@ -50,12 +48,11 @@ export default function Preloader({ onComplete }: { onComplete?: () => void }) {
             overflow: 'hidden'
           }}
         >
-          {/* Subtle central ambient glow */}
           <div
             style={{
               position: 'absolute',
-              width: '300px',
-              height: '300px',
+              width: '320px',
+              height: '320px',
               background: 'rgba(234, 179, 8, 0.12)',
               filter: 'blur(120px)',
               borderRadius: '50%'
