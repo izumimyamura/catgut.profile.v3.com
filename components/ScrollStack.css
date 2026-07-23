@@ -1,0 +1,40 @@
+.scroll-stack-scroller {
+  position: relative;
+  width: 100%;
+}
+
+.scroll-stack-inner {
+  padding: 10vh 5rem 20vh;
+}
+
+.scroll-stack-card-wrapper {
+  position: relative;
+}
+
+.scroll-stack-card {
+  transform-origin: top center;
+  will-change: transform, opacity; 
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+  height: 60vh;
+  min-height: 400px;
+  width: 100%;
+  margin: 30px 0;
+  padding: 0;
+  border-radius: 40px;
+  box-sizing: border-box;
+  -webkit-transform: translate3d(0,0,0);
+  transform: translate3d(0,0,0);
+  position: relative;
+  
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.scroll-stack-end {
+  width: 100%;
+  height: 1px;
+}
