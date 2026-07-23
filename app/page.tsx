@@ -3,12 +3,10 @@ import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 
-// Dynamically load client-side components to eliminate SSR hydration issues
+// Dynamically load client-side components
 const Preloader = dynamic(() => import('../components/Preloader'), { ssr: false });
 const SideRays = dynamic(() => import('../components/SideRays'), { ssr: false });
 const BlurText = dynamic(() => import('../components/BlurText'), { ssr: false });
-const ScrollStack = dynamic(() => import('../components/ScrollStack'), { ssr: false });
-const ScrollStackItem = dynamic(() => import('../components/ScrollStack').then(mod => mod.ScrollStackItem), { ssr: false });
 const CardSwap = dynamic(() => import('../components/CardSwap'), { ssr: false });
 const Card = dynamic(() => import('../components/CardSwap').then(mod => mod.Card), { ssr: false });
 
@@ -25,6 +23,10 @@ export default function Home() {
         .standard-video-card { display: flex; flex-direction: row; width: 100%; max-width: 1200px; margin: 0 auto; background-color: #050505; border: 1px solid rgba(255,255,255,0.08); border-radius: 40px; overflow: hidden; margin-bottom: 4rem; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
         .standard-video-left { flex: 0 0 45%; position: relative; border-right: 1px solid rgba(255,255,255,0.08); }
         .standard-video-right { flex: 1; padding: 4rem; display: flex; flex-direction: column; justify-content: center; }
+        
+        .stack-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+        .stack-card { position: relative; border-radius: 24px; border: 1px solid rgba(255,255,255,0.08); padding: 3rem 2rem; display: flex; flex-direction: column; align-items: center; text-align: center; overflow: hidden; background-color: #050505; }
+        
         @media (max-width: 900px) {
           .standard-video-card { flex-direction: column; border-radius: 24px; }
           .standard-video-left { flex: 0 0 400px; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.08); }
@@ -63,64 +65,64 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SOFTWARE SCROLL STACK */}
-      <section id="stack" style={{ width: '100vw', backgroundColor: '#000', position: 'relative', zIndex: 20 }}>
-        <ScrollStack useWindowScroll={true} itemDistance={80} blurAmount={0}>
+      {/* SOFTWARE STACK SECTION (CLEAN STATIC GRID) */}
+      <section id="stack" style={{ width: '100vw', backgroundColor: '#000', position: 'relative', zIndex: 20, paddingTop: '10vh', paddingBottom: '10vh' }}>
+        <div style={{ textAlign: 'center', paddingBottom: '6vh' }}>
+          <h2 style={{ fontSize: 'clamp(2.5rem, 5vw, 4.5rem)', fontWeight: 900, letterSpacing: '-0.04em', margin: 0 }}>My Software Stack</h2>
+          <p style={{ color: '#a1a1aa', fontSize: '1.2rem', marginTop: '0.8rem', fontWeight: 500 }}>The core tools behind my motion design, color grading, and video edits.</p>
+        </div>
+
+        <div className="stack-grid">
           
-          <ScrollStackItem>
-            <div style={{ width: '100%', height: '100%', position: 'relative', background: 'linear-gradient(145deg, #050505 40%, #1a0b2e 100%)', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '3rem', textAlign: 'center' }}>
-              <div style={{ position: 'absolute', width: '300px', height: '300px', background: 'rgba(153, 153, 255, 0.15)', filter: 'blur(100px)', top: '20%' }} />
-              <img src="https://upload.wikimedia.org/wikipedia/commons/c/cb/Adobe_After_Effects_CC_icon.svg" alt="After Effects" style={{ width: '100px', height: '100px', marginBottom: '2rem', zIndex: 10 }} />
-              <div style={{ position: 'relative', zIndex: 10 }}>
-                <h2 style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', fontWeight: 800, margin: 0, color: '#fff', letterSpacing: '-0.03em' }}>Adobe After Effects</h2>
-                <p style={{ color: '#a1a1aa', fontSize: '1.2rem', marginTop: '1rem', maxWidth: '700px', lineHeight: 1.6, marginInline: 'auto' }}>The industry-standard tool for creating complex motion graphics, visual effects, and animated text.</p>
-              </div>
+          {/* After Effects */}
+          <div className="stack-card" style={{ background: 'linear-gradient(145deg, #050505 40%, #1a0b2e 100%)' }}>
+            <div style={{ position: 'absolute', width: '200px', height: '200px', background: 'rgba(153, 153, 255, 0.12)', filter: 'blur(80px)', top: '10%' }} />
+            <img src="https://upload.wikimedia.org/wikipedia/commons/c/cb/Adobe_After_Effects_CC_icon.svg" alt="After Effects" style={{ width: '80px', height: '80px', marginBottom: '1.5rem', zIndex: 10 }} />
+            <div style={{ position: 'relative', zIndex: 10 }}>
+              <h3 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0, color: '#fff', letterSpacing: '-0.02em' }}>Adobe After Effects</h3>
+              <p style={{ color: '#a1a1aa', fontSize: '1rem', marginTop: '0.8rem', lineHeight: 1.6 }}>The industry-standard tool for creating complex motion graphics, visual effects, and animated text.</p>
             </div>
-          </ScrollStackItem>
+          </div>
 
-          <ScrollStackItem>
-            <div style={{ width: '100%', height: '100%', position: 'relative', background: 'linear-gradient(145deg, #050505 40%, #2e0f0b 100%)', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '3rem', textAlign: 'center' }}>
-              <div style={{ position: 'absolute', width: '300px', height: '300px', background: 'rgba(239, 68, 68, 0.15)', filter: 'blur(100px)', top: '20%' }} />
-              <img src="https://upload.wikimedia.org/wikipedia/commons/4/4d/DaVinci_Resolve_Studio.png" alt="DaVinci Resolve" style={{ width: '100px', height: '100px', marginBottom: '2rem', zIndex: 10 }} />
-              <div style={{ position: 'relative', zIndex: 10 }}>
-                <h2 style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', fontWeight: 800, margin: 0, color: '#fff', letterSpacing: '-0.03em' }}>DaVinci Resolve</h2>
-                <p style={{ color: '#a1a1aa', fontSize: '1.2rem', marginTop: '1rem', maxWidth: '700px', lineHeight: 1.6, marginInline: 'auto' }}>A powerful, all-in-one software offering high-end color grading, audio mixing, and video editing in a single interface.</p>
-              </div>
+          {/* DaVinci Resolve */}
+          <div className="stack-card" style={{ background: 'linear-gradient(145deg, #050505 40%, #2e0f0b 100%)' }}>
+            <div style={{ position: 'absolute', width: '200px', height: '200px', background: 'rgba(239, 68, 68, 0.12)', filter: 'blur(80px)', top: '10%' }} />
+            <img src="https://upload.wikimedia.org/wikipedia/commons/4/4d/DaVinci_Resolve_Studio.png" alt="DaVinci Resolve" style={{ width: '80px', height: '80px', marginBottom: '1.5rem', zIndex: 10 }} />
+            <div style={{ position: 'relative', zIndex: 10 }}>
+              <h3 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0, color: '#fff', letterSpacing: '-0.02em' }}>DaVinci Resolve</h3>
+              <p style={{ color: '#a1a1aa', fontSize: '1rem', marginTop: '0.8rem', lineHeight: 1.6 }}>A powerful, all-in-one software offering high-end color grading, audio mixing, and video editing in a single interface.</p>
             </div>
-          </ScrollStackItem>
+          </div>
 
-          <ScrollStackItem>
-            <div style={{ width: '100%', height: '100%', position: 'relative', background: 'linear-gradient(145deg, #050505 40%, #0b1a2e 100%)', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '3rem', textAlign: 'center' }}>
-              <div style={{ position: 'absolute', width: '300px', height: '300px', background: 'rgba(59, 130, 246, 0.15)', filter: 'blur(100px)', top: '20%' }} />
-              <div style={{ position: 'relative', zIndex: 10 }}>
-                <h2 style={{ fontSize: 'clamp(2.5rem, 5vw, 4.5rem)', fontWeight: 900, margin: 0, color: '#fff', letterSpacing: '-0.03em', textShadow: '0 4px 20px rgba(59, 130, 246, 0.3)' }}>Apple Motion</h2>
-                <p style={{ color: '#a1a1aa', fontSize: '1.3rem', marginTop: '1.5rem', maxWidth: '700px', lineHeight: 1.6, marginInline: 'auto' }}>A streamlined, Mac-only motion graphics application built to design templates and animations directly for Final Cut Pro.</p>
-              </div>
+          {/* Apple Motion */}
+          <div className="stack-card" style={{ background: 'linear-gradient(145deg, #050505 40%, #0b1a2e 100%)' }}>
+            <div style={{ position: 'absolute', width: '200px', height: '200px', background: 'rgba(59, 130, 246, 0.12)', filter: 'blur(80px)', top: '10%' }} />
+            <div style={{ position: 'relative', zIndex: 10, marginTop: '1rem' }}>
+              <h3 style={{ fontSize: '2rem', fontWeight: 900, margin: 0, color: '#fff', letterSpacing: '-0.02em', textShadow: '0 4px 15px rgba(59, 130, 246, 0.3)', marginBottom: '1rem' }}>Apple Motion</h3>
+              <p style={{ color: '#a1a1aa', fontSize: '1rem', marginTop: '0.8rem', lineHeight: 1.6 }}>A streamlined, Mac-only motion graphics application built to design templates and animations directly for Final Cut Pro.</p>
             </div>
-          </ScrollStackItem>
+          </div>
 
-          <ScrollStackItem>
-            <div style={{ width: '100%', height: '100%', position: 'relative', background: 'linear-gradient(145deg, #050505 40%, #2e0b2a 100%)', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '3rem', textAlign: 'center' }}>
-              <div style={{ position: 'absolute', width: '300px', height: '300px', background: 'rgba(168, 85, 247, 0.15)', filter: 'blur(100px)', top: '20%' }} />
-              <img src="https://upload.wikimedia.org/wikipedia/commons/4/40/Adobe_Premiere_Pro_CC_icon.svg" alt="Premiere Pro" style={{ width: '100px', height: '100px', marginBottom: '2rem', zIndex: 10 }} />
-              <div style={{ position: 'relative', zIndex: 10 }}>
-                <h2 style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', fontWeight: 800, margin: 0, color: '#fff', letterSpacing: '-0.03em' }}>Adobe Premiere Pro</h2>
-                <p style={{ color: '#a1a1aa', fontSize: '1.2rem', marginTop: '1rem', maxWidth: '700px', lineHeight: 1.6, marginInline: 'auto' }}>The professional, flexible editing software of choice for television, film, and digital creators with a broad ecosystem of third-party plugins.</p>
-              </div>
+          {/* Adobe Premiere Pro */}
+          <div className="stack-card" style={{ background: 'linear-gradient(145deg, #050505 40%, #2e0b2a 100%)' }}>
+            <div style={{ position: 'absolute', width: '200px', height: '200px', background: 'rgba(168, 85, 247, 0.12)', filter: 'blur(80px)', top: '10%' }} />
+            <img src="https://upload.wikimedia.org/wikipedia/commons/4/40/Adobe_Premiere_Pro_CC_icon.svg" alt="Premiere Pro" style={{ width: '80px', height: '80px', marginBottom: '1.5rem', zIndex: 10 }} />
+            <div style={{ position: 'relative', zIndex: 10 }}>
+              <h3 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0, color: '#fff', letterSpacing: '-0.02em' }}>Adobe Premiere Pro</h3>
+              <p style={{ color: '#a1a1aa', fontSize: '1rem', marginTop: '0.8rem', lineHeight: 1.6 }}>The professional, flexible editing software of choice for television, film, and digital creators with a broad ecosystem of third-party plugins.</p>
             </div>
-          </ScrollStackItem>
+          </div>
 
-          <ScrollStackItem>
-            <div style={{ width: '100%', height: '100%', position: 'relative', background: 'linear-gradient(145deg, #050505 40%, #112222 100%)', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '3rem', textAlign: 'center' }}>
-              <div style={{ position: 'absolute', width: '300px', height: '300px', background: 'rgba(255, 255, 255, 0.1)', filter: 'blur(100px)', top: '20%' }} />
-              <div style={{ position: 'relative', zIndex: 10 }}>
-                <h2 style={{ fontSize: 'clamp(2.5rem, 5vw, 4.5rem)', fontWeight: 900, margin: 0, color: '#fff', letterSpacing: '-0.03em', textShadow: '0 4px 20px rgba(255, 255, 255, 0.2)' }}>CapCut</h2>
-                <p style={{ color: '#a1a1aa', fontSize: '1.3rem', marginTop: '1.5rem', maxWidth: '700px', lineHeight: 1.6, marginInline: 'auto' }}>A highly accessible, user-friendly editor for mobile and desktop, packed with AI tools and templates for rapid social media content.</p>
-              </div>
+          {/* CapCut */}
+          <div className="stack-card" style={{ background: 'linear-gradient(145deg, #050505 40%, #112222 100%)' }}>
+            <div style={{ position: 'absolute', width: '200px', height: '200px', background: 'rgba(255, 255, 255, 0.08)', filter: 'blur(80px)', top: '10%' }} />
+            <div style={{ position: 'relative', zIndex: 10, marginTop: '1rem' }}>
+              <h3 style={{ fontSize: '2rem', fontWeight: 900, margin: 0, color: '#fff', letterSpacing: '-0.02em', textShadow: '0 4px 15px rgba(255, 255, 255, 0.2)', marginBottom: '1rem' }}>CapCut</h3>
+              <p style={{ color: '#a1a1aa', fontSize: '1rem', marginTop: '0.8rem', lineHeight: 1.6 }}>A highly accessible, user-friendly editor for mobile and desktop, packed with AI tools and templates for rapid social media content.</p>
             </div>
-          </ScrollStackItem>
+          </div>
 
-        </ScrollStack>
+        </div>
       </section>
 
       {/* REELS SECTION */}
