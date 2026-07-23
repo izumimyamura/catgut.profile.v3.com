@@ -1,56 +1,109 @@
 'use client';
-import { useRef, useState } from 'react';
-import Spline from '@splinetool/react-spline';
+
+import React, { useEffect, useRef, useState } from "react";
+import Spline from "@splinetool/react-spline";
+import { Application, SplineEvent } from "@splinetool/runtime";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { SKILLS, Skill } from "../src/data/constants";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function KeyboardSection() {
-  const [activeSkill, setActiveSkill] = useState<string | null>(null);
-  const splineRef = useRef<any>(null);
+  const [splineApp, setSplineApp] = useState<Application | null>(null);
+  const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const SKILL_DETAILS: Record<string, { title: string; desc: string }> = {
-    ae: { title: "Adobe After Effects", desc: "Complex motion graphics, visual effects, and animated text." },
-    davinci: { title: "DaVinci Resolve", desc: "High-end color grading nodes and audio soundscapes." },
-    motion: { title: "Apple Motion", desc: "Streamlined Mac motion graphics templates for FCP." },
-    premiere: { title: "Adobe Premiere Pro", desc: "Industry standard non-linear timeline video editing." },
-    capcut: { title: "CapCut", desc: "Rapid social media content and AI toolsets." },
-  };
+  function onLoad(app: Application) {
+    setSplineApp(app);
 
-  function onLoad(splineApp: any) {
-    splineRef.current = splineApp;
-  }
+    // Unhide main 3D objects & keycaps inside Spline
+    try {
+      const kbd = app.findObjectByName("keyboard");
+      if (kbd) kbd.visible = true;
 
-  function onMouseDown(e: any) {
-    const targetName = e.target.name?.toLowerCase();
-    if (SKILL_DETAILS[targetName]) {
-      setActiveSkill(targetName);
+      const allObjects = app.getAllObjects();
+      allObjects.forEach((obj) => {
+        if (obj.name.includes("keycap") || SKILLS[obj.name]) {
+          obj.visible = true;
+        }
+      });
+    } catch (e) {
+      console.log("Spline initialization complete.");
     }
   }
 
+  // Handle clicking keycaps on the 3D keyboard
+  const handleMouseHover = (e: SplineEvent) => {
+    if (!splineApp) return;
+    const skill = SKILLS[e.target.name];
+    if (skill) {
+      setSelectedSkill(skill);
+      try {
+        splineApp.setVariable("heading", skill.label);
+        splineApp.setVariable("desc", skill.shortDescription);
+      } catch (err) {}
+    }
+  };
+
+  useEffect(() => {
+    if (!splineApp || !containerRef.current) return;
+
+    splineApp.addEventListener("mouseHover", handleMouseHover);
+
+    const kbd = splineApp.findObjectByName("keyboard");
+    if (kbd) {
+      // 3D Scroll Rotation & Spin Animation
+      gsap.to(kbd.rotation, {
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1.2,
+        },
+        y: Math.PI * 2,
+        x: Math.PI * 0.15,
+        ease: "none",
+      });
+    }
+
+    return () => {
+      ScrollTrigger.getAll().forEach((t) => t.kill());
+    };
+  }, [splineApp]);
+
   return (
-    <section id="stack" style={{ width: '100vw', minHeight: '100vh', backgroundColor: '#000', position: 'relative', zIndex: 20, padding: '8vh 0', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-        <h2 style={{ fontSize: 'clamp(2.5rem, 5vw, 4.5rem)', fontWeight: 900, letterSpacing: '-0.04em', margin: 0 }}>
+    <section
+      id="stack"
+      ref={containerRef}
+      className="relative z-20 min-h-screen w-full bg-black py-20 flex flex-col items-center justify-center overflow-hidden"
+    >
+      <div className="text-center mb-8 px-4">
+        <h2 className="text-4xl md:text-6xl font-extrabold tracking-tight text-white mb-3">
           My Software Stack
         </h2>
-        <p style={{ color: '#a1a1aa', fontSize: '1.2rem', marginTop: '0.8rem' }}>
-          Click keycaps on the interactive 3D keyboard below.
+        <p className="text-zinc-400 text-lg md:text-xl">
+          Scroll to spin the keyboard — Click keycaps to inspect skills.
         </p>
       </div>
 
-      <div style={{ width: '100%', maxWidth: '1100px', height: '550px', position: 'relative' }}>
+      {/* Full 3D Spline Canvas */}
+      <div className="w-full max-w-6xl h-[600px] relative flex items-center justify-center">
         <Spline
           scene="/assets/skills-keyboard.spline"
           onLoad={onLoad}
-          onMouseDown={onMouseDown}
+          className="w-full h-full"
         />
       </div>
 
-      {activeSkill && SKILL_DETAILS[activeSkill] && (
-        <div style={{ marginTop: '2rem', padding: '1.5rem 2.5rem', backgroundColor: '#050505', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '16px', textAlign: 'center', maxWidth: '500px' }}>
-          <h3 style={{ margin: 0, fontSize: '1.5rem', color: '#EAB308' }}>
-            {SKILL_DETAILS[activeSkill].title}
+      {/* Selected Skill Information Popup */}
+      {selectedSkill && (
+        <div className="mt-6 px-8 py-5 bg-zinc-950 border border-zinc-800 rounded-2xl text-center max-w-lg shadow-2xl backdrop-blur-md">
+          <h3 className="text-xl font-bold text-yellow-500 mb-1">
+            {selectedSkill.label}
           </h3>
-          <p style={{ color: '#a1a1aa', marginTop: '0.5rem', marginBottom: 0 }}>
-            {SKILL_DETAILS[activeSkill].desc}
+          <p className="text-zinc-400 text-sm leading-relaxed">
+            {selectedSkill.shortDescription}
           </p>
         </div>
       )}
