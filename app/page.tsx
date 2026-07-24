@@ -11,6 +11,7 @@ const CardSwap = dynamic(() => import('../components/CardSwap'), { ssr: false })
 const Card = dynamic(() => import('../components/CardSwap').then(mod => mod.Card), { ssr: false });
 const AnimatedBackground = dynamic(() => import('../components/AnimatedBackground'), { ssr: false });
 const TerminalSkillCard = dynamic(() => import('../components/TerminalSkillCard'), { ssr: false });
+const TextScramble = dynamic(() => import('../components/TextScramble'), { ssr: false });
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
@@ -144,10 +145,12 @@ export default function Home() {
         </div>
       </section>
 
-      {/* REELS / PROJECTS SECTION (Apple Style Side Slider) */}
+      {/* REELS / PROJECTS SECTION (Japanese to English Decipher) */}
       <section id="projects" style={{ width: '100vw', position: 'relative', zIndex: 10, paddingTop: '12vh', paddingBottom: '12vh' }}>
         <div style={{ textAlign: 'center', paddingBottom: '4vh' }}>
-          <h2 style={{ fontSize: 'clamp(3rem, 6vw, 6rem)', fontWeight: 900, letterSpacing: '-0.04em', margin: 0 }}>Some of my projects.</h2>
+          <h2 style={{ fontSize: 'clamp(3rem, 6vw, 6rem)', fontWeight: 900, letterSpacing: '-0.04em', margin: 0 }}>
+            <TextScramble text="Some of my projects." fromLang="japanese" />
+          </h2>
           <p style={{ color: '#a1a1aa', fontSize: 'clamp(1.2rem, 2vw, 1.5rem)', marginTop: '1rem', fontWeight: 500 }}>Retention-focused edits. Swipe or click to explore.</p>
         </div>
 
@@ -196,15 +199,15 @@ export default function Home() {
         </div>
       </section>
 
-      {/* PHOTO CARD STACK SECTION Anchor (All 4 cards restored) */}
+      {/* PHOTO CARD STACK SECTION (Tamil to English Decipher) */}
       <section id="photos" style={{ width: '100vw', position: 'relative', zIndex: 10, borderTop: '1px solid rgba(255,255,255,0.05)', padding: '15vh 0' }}>
         <div className="split-container" style={{ display: 'flex', width: '100%', maxWidth: '1400px', margin: '0 auto', alignItems: 'center' }}>
           <div className="split-text" style={{ flex: '1 1 400px', paddingLeft: '5vw', zIndex: 30 }}>
             <h2 style={{ fontSize: 'clamp(3rem, 5vw, 4.5rem)', fontWeight: 500, letterSpacing: '-0.02em', margin: 0, lineHeight: 1.1 }}>
-              Card stacks have never looked so good
+              <TextScramble text="Card stacks have never looked so good" fromLang="tamil" />
             </h2>
             <p style={{ color: '#71717a', fontSize: '1.5rem', marginTop: '1.5rem', fontWeight: 400 }}>
-              Just look at it go!
+              <TextScramble text="Just look at it go!" fromLang="tamil" />
             </p>
           </div>
 
@@ -241,7 +244,7 @@ export default function Home() {
         <p style={{ color: '#a1a1aa', fontSize: '1.3rem', marginTop: '1rem', textAlign: 'center' }}>Click keycaps directly on the 3D keyboard to view details.</p>
       </section>
 
-      {/* WEB DEVELOPMENT SKILLS SECTION (Stacked Terminal Windows with 20s auto-switch) */}
+      {/* WEB DEVELOPMENT SKILLS SECTION */}
       <section id="webdev" style={{ width: '100vw', backgroundColor: 'rgba(0,0,0,0.85)', position: 'relative', zIndex: 10, padding: '15vh 2rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
         <div style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto 4rem auto' }}>
           <span style={{ color: '#EAB308', fontSize: '0.9rem', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase' }}>Full Stack Capabilities</span>
