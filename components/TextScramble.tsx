@@ -7,7 +7,7 @@ const CHAR_SETS = {
   tamil: 'அஆஇஈஉஊஎஏஐஒஓஔகஙசஜஞடணதநபமயரலவஶஷஸஹளழறன',
 };
 
-interface TextScrambleProps {
+export interface TextScrambleProps {
   text: string;
   fromLang?: 'japanese' | 'tamil';
   speed?: number;
@@ -18,7 +18,7 @@ interface TextScrambleProps {
 export default function TextScramble({
   text,
   fromLang = 'japanese',
-  speed = 40,
+  speed = 18, // Decreased interval for a faster decoding tick
   className = '',
   style = {},
 }: TextScrambleProps) {
@@ -29,7 +29,6 @@ export default function TextScramble({
   const glyphs = CHAR_SETS[fromLang] || CHAR_SETS.japanese;
 
   useEffect(() => {
-    // Trigger animation when the element scrolls into view
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && !hasAnimated) {
@@ -49,25 +48,23 @@ export default function TextScramble({
 
   const startScramble = () => {
     let frame = 0;
-    const totalFrames = text.length * 4;
+    // Reduced from length * 4 to length * 2 for double speed reveal
+    const totalFrames = Math.max(text.length * 2, 20);
 
     const interval = setInterval(() => {
       let output = '';
       const progress = frame / totalFrames;
 
       for (let i = 0; i < text.length; i++) {
-        // Leave spaces intact
         if (text[i] === ' ') {
           output += ' ';
           continue;
         }
 
-        // Determine if this letter is already decoded
         const charProgress = i / text.length;
         if (progress > charProgress) {
           output += text[i];
         } else {
-          // Random character from character set
           const randomGlyph = glyphs[Math.floor(Math.random() * glyphs.length)];
           output += randomGlyph;
         }
