@@ -2,37 +2,67 @@
 
 import React, { useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { ScrollControls, useScroll, Text } from '@react-three/drei';
+import { ScrollControls, useScroll, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { WORK_TIMELINE, WorkTimelinePoint } from '../constants';
 
-const reusableLeft = new THREE.Vector3(-0.3, 0, -0.1);
-const reusableRight = new THREE.Vector3(0.3, 0, -0.1);
-
 function TimelinePointItem({ point }: { point: WorkTimelinePoint }) {
-  const offsetPos = point.position === 'left' ? reusableLeft : reusableRight;
-  const textAlign = point.position === 'left' ? 'right' : 'left';
+  const isLeft = point.position === 'left';
 
   return (
-    <group position={point.point} scale={0.6}>
-      {/* Cube Indicator */}
-      <mesh position={[0, 0, -0.1]}>
-        <boxGeometry args={[0.25, 0.25, 0.25]} />
+    <group position={point.point}>
+      {/* 3D Glowing Wireframe Box */}
+      <mesh scale={0.25}>
+        <boxGeometry args={[1, 1, 1]} />
         <meshBasicMaterial color="#EAB308" wireframe />
       </mesh>
 
-      {/* Text Info */}
-      <group position={offsetPos}>
-        <Text color="#ffffff" fontSize={0.35} anchorX={textAlign} position={[0, 0.4, 0]}>
-          {point.year}
-        </Text>
-        <Text color="#EAB308" fontSize={0.55} maxWidth={3.5} anchorX={textAlign} position={[0, 0, 0]}>
-          {point.title}
-        </Text>
-        <Text color="#a1a1aa" fontSize={0.22} maxWidth={3.5} anchorX={textAlign} position={[0, -0.45, 0]}>
-          {point.subtitle}
-        </Text>
-      </group>
+      {/* HTML Overlay Label (100% crash-proof across all browsers/devices) */}
+      <Html
+        position={isLeft ? [-0.4, 0, 0] : [0.4, 0, 0]}
+        center
+        style={{
+          pointerEvents: 'none',
+          width: '280px',
+          textAlign: isLeft ? 'right' : 'left',
+          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        }}
+      >
+        <div style={{ transform: isLeft ? 'translateX(-50%)' : 'translateX(50%)' }}>
+          <span
+            style={{
+              fontSize: '0.85rem',
+              fontWeight: 800,
+              color: '#ffffff',
+              letterSpacing: '0.1em',
+              display: 'block',
+            }}
+          >
+            {point.year}
+          </span>
+          <h3
+            style={{
+              fontSize: '1.25rem',
+              fontWeight: 900,
+              color: '#EAB308',
+              margin: '0.2rem 0',
+              lineHeight: 1.2,
+            }}
+          >
+            {point.title}
+          </h3>
+          <p
+            style={{
+              fontSize: '0.8rem',
+              color: '#a1a1aa',
+              margin: 0,
+              lineHeight: 1.4,
+            }}
+          >
+            {point.subtitle}
+          </p>
+        </div>
+      </Html>
     </group>
   );
 }
@@ -63,7 +93,7 @@ function Track3D() {
       const p = Math.min(Math.max(scrollData.range(0, 1), 0), 1);
       const targetPos = curve.getPoint(p);
 
-      // Smooth camera interpolation
+      // Smooth camera dampening
       camera.position.x = THREE.MathUtils.damp(camera.position.x, targetPos.x, 4, delta);
       camera.position.y = THREE.MathUtils.damp(camera.position.y, targetPos.y + 1, 4, delta);
       camera.position.z = THREE.MathUtils.damp(camera.position.z, targetPos.z + 5, 4, delta);
@@ -83,7 +113,7 @@ function Track3D() {
 
 export default function TimelineCanvas() {
   return (
-    <div style={{ width: '100vw', height: '100vh', backgroundColor: '#050505', position: 'relative' }}>
+    <div style={{ width: '100vw', height: '100vh', backgroundColor: '#050505', position: 'relative', overflow: 'hidden' }}>
       <Canvas camera={{ position: [0, 1, 6], fov: 60 }}>
         <ambientLight intensity={0.8} />
         <pointLight position={[10, 10, 10]} intensity={1.5} />
@@ -125,7 +155,7 @@ export default function TimelineCanvas() {
       </a>
 
       {/* Scroll Hint */}
-      <div style={{ position: 'absolute', bottom: '2rem', left: '50%', transform: 'translateX(-50%)', color: '#71717a', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '0.2em' }}>
+      <div style={{ position: 'absolute', bottom: '2rem', left: '50%', transform: 'translateX(-50%)', color: '#71717a', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '0.2em', pointerEvents: 'none' }}>
         SCROLL TO TRAVERSE TIMELINE
       </div>
     </div>
