@@ -1,68 +1,75 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { ScrollControls, useScroll, Html } from '@react-three/drei';
+import { ScrollControls, useScroll, Text } from '@react-three/drei';
 import * as THREE from 'three';
 import { WORK_TIMELINE, WorkTimelinePoint } from '../constants';
 
 function TimelinePointItem({ point }: { point: WorkTimelinePoint }) {
+  const groupRef = useRef<THREE.Group>(null);
   const isLeft = point.position === 'left';
+  const textAlign = isLeft ? 'right' : 'left';
+  const textX = isLeft ? -0.5 : 0.5;
+
+  useFrame(({ camera }) => {
+    if (groupRef.current) {
+      // Calculate distance between camera and point for distance fading
+      const dist = camera.position.distanceTo(groupRef.current.position);
+      // Fade out labels if too far or past camera
+      const opacity = THREE.MathUtils.clamp(1 - Math.abs(dist - 6) / 8, 0, 1);
+      
+      groupRef.current.children.forEach((child) => {
+        if ('material' in child && child.material) {
+          (child.material as THREE.Material).transparent = true;
+          (child.material as THREE.Material).opacity = opacity;
+        }
+      });
+    }
+  });
 
   return (
-    <group position={point.point}>
+    <group ref={groupRef} position={point.point}>
       {/* 3D Glowing Wireframe Box */}
-      <mesh scale={0.25}>
-        <boxGeometry args={[1, 1, 1]} />
+      <mesh position={[0, 0, 0]}>
+        <boxGeometry args={[0.3, 0.3, 0.3]} />
         <meshBasicMaterial color="#EAB308" wireframe />
       </mesh>
 
-      {/* HTML Overlay Label (100% crash-proof across all browsers/devices) */}
-      <Html
-        position={isLeft ? [-0.4, 0, 0] : [0.4, 0, 0]}
-        center
-        style={{
-          pointerEvents: 'none',
-          width: '280px',
-          textAlign: isLeft ? 'right' : 'left',
-          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-        }}
+      {/* Year */}
+      <Text
+        font="/Vercetti-Regular.woff"
+        fontSize={0.35}
+        color="#ffffff"
+        anchorX={textAlign}
+        position={[textX, 0.4, 0]}
       >
-        <div style={{ transform: isLeft ? 'translateX(-50%)' : 'translateX(50%)' }}>
-          <span
-            style={{
-              fontSize: '0.85rem',
-              fontWeight: 800,
-              color: '#ffffff',
-              letterSpacing: '0.1em',
-              display: 'block',
-            }}
-          >
-            {point.year}
-          </span>
-          <h3
-            style={{
-              fontSize: '1.25rem',
-              fontWeight: 900,
-              color: '#EAB308',
-              margin: '0.2rem 0',
-              lineHeight: 1.2,
-            }}
-          >
-            {point.title}
-          </h3>
-          <p
-            style={{
-              fontSize: '0.8rem',
-              color: '#a1a1aa',
-              margin: 0,
-              lineHeight: 1.4,
-            }}
-          >
-            {point.subtitle}
-          </p>
-        </div>
-      </Html>
+        {point.year}
+      </Text>
+
+      {/* Title */}
+      <Text
+        font="/soria-font.ttf"
+        fontSize={0.55}
+        color="#EAB308"
+        maxWidth={3.5}
+        anchorX={textAlign}
+        position={[textX, 0, 0]}
+      >
+        {point.title}
+      </Text>
+
+      {/* Subtitle */}
+      <Text
+        font="/Vercetti-Regular.woff"
+        fontSize={0.22}
+        color="#a1a1aa"
+        maxWidth={3.5}
+        anchorX={textAlign}
+        position={[textX, -0.45, 0]}
+      >
+        {point.subtitle}
+      </Text>
     </group>
   );
 }
@@ -70,7 +77,7 @@ function TimelinePointItem({ point }: { point: WorkTimelinePoint }) {
 function NativeLine({ points }: { points: THREE.Vector3[] }) {
   const lineObject = useMemo(() => {
     const geometry = new THREE.BufferGeometry().setFromPoints(points);
-    const material = new THREE.LineBasicMaterial({ color: '#EAB308', linewidth: 3 });
+    const material = new THREE.LineBasicMaterial({ color: '#EAB308', linewidth: 3, transparent: true, opacity: 0.8 });
     return new THREE.Line(geometry, material);
   }, [points]);
 
@@ -86,17 +93,21 @@ function Track3D() {
     [timeline]
   );
 
-  const curvePoints = useMemo(() => curve.getPoints(200), [curve]);
+  const curvePoints = useMemo(() => curve.getPoints(300), [curve]);
 
   useFrame(({ camera }, delta) => {
-    if (scrollData) {
-      const p = Math.min(Math.max(scrollData.range(0, 1), 0), 1);
-      const targetPos = curve.getPoint(p);
+    if (!scrollData) return;
+    const rawVal = scrollData.range(0, 1);
+    if (isNaN(rawVal)) return;
 
-      // Smooth camera dampening
-      camera.position.x = THREE.MathUtils.damp(camera.position.x, targetPos.x, 4, delta);
-      camera.position.y = THREE.MathUtils.damp(camera.position.y, targetPos.y + 1, 4, delta);
-      camera.position.z = THREE.MathUtils.damp(camera.position.z, targetPos.z + 5, 4, delta);
+    const p = Math.min(Math.max(rawVal, 0), 1);
+    const targetPos = curve.getPoint(p);
+
+    if (targetPos && !isNaN(targetPos.x) && !isNaN(targetPos.y) && !isNaN(targetPos.z)) {
+      // Smooth camera motion along curve
+      camera.position.x = THREE.MathUtils.damp(camera.position.x, targetPos.x, 3, delta);
+      camera.position.y = THREE.MathUtils.damp(camera.position.y, targetPos.y + 0.5, 3, delta);
+      camera.position.z = THREE.MathUtils.damp(camera.position.z, targetPos.z + 6, 3, delta);
       camera.lookAt(targetPos.x, targetPos.y, targetPos.z - 2);
     }
   });
@@ -114,10 +125,10 @@ function Track3D() {
 export default function TimelineCanvas() {
   return (
     <div style={{ width: '100vw', height: '100vh', backgroundColor: '#050505', position: 'relative', overflow: 'hidden' }}>
-      <Canvas camera={{ position: [0, 1, 6], fov: 60 }}>
+      <Canvas camera={{ position: [1.5, 0.5, 6], fov: 60 }}>
         <ambientLight intensity={0.8} />
         <pointLight position={[10, 10, 10]} intensity={1.5} />
-        <ScrollControls pages={5} damping={0.3}>
+        <ScrollControls pages={6} damping={0.25}>
           <Track3D />
         </ScrollControls>
       </Canvas>

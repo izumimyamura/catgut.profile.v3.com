@@ -8,35 +8,35 @@ export interface WorkTimelinePoint {
 
 export const WORK_TIMELINE: WorkTimelinePoint[] = [
   {
-    point: [0, 0, 0],
+    point: [1.5, 0, 0],
     year: '2015',
     title: 'YouTube Gaming Content',
     subtitle: 'Started video editing & content creation for gaming channels',
     position: 'right',
   },
   {
-    point: [-4, -4, -3],
+    point: [-2.0, -1.5, -8],
     year: '2017',
     title: 'Short Film Editor',
     subtitle: 'Joined narrative productions handling timeline cuts & audio balance',
     position: 'left',
   },
   {
-    point: [-3, -1, -6],
+    point: [2.0, -0.5, -16],
     year: '2019',
     title: 'CapCut & Instagram Edits',
     subtitle: 'Mastered CapCut, mobile speed ramping, memes & viral gaming hooks',
-    position: 'left',
-  },
-  {
-    point: [0, -1, -10],
-    year: '2025',
-    title: 'Heisenbergo Studio',
-    subtitle: 'Choreographer & Editor for college short films; founded Heisenbergo Studio',
     position: 'right',
   },
   {
-    point: [1, 1, -12],
+    point: [-1.8, 1.0, -24],
+    year: '2025',
+    title: 'Heisenbergo Studio',
+    subtitle: 'Choreographer & Editor for college short films; founded Heisenbergo Studio',
+    position: 'left',
+  },
+  {
+    point: [1.8, 0.5, -32],
     year: '2026',
     title: 'CATGUYEDITS',
     subtitle: 'Launched official editing firm & CATGUYEDITS under Heisenbergo Studio',
