@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { ScrollControls, useScroll, Line, Box, Edges, Text } from '@react-three/drei';
+import { ScrollControls, useScroll, Text } from '@react-three/drei';
 import * as THREE from 'three';
 import { WORK_TIMELINE, WorkTimelinePoint } from '../constants';
 
@@ -15,11 +15,13 @@ function TimelinePointItem({ point }: { point: WorkTimelinePoint }) {
 
   return (
     <group position={point.point} scale={0.6}>
-      <Box args={[0.25, 0.25, 0.25]} position={[0, 0, -0.1]}>
+      {/* Cube Indicator */}
+      <mesh position={[0, 0, -0.1]}>
+        <boxGeometry args={[0.25, 0.25, 0.25]} />
         <meshBasicMaterial color="#EAB308" wireframe />
-        <Edges color="#EAB308" lineWidth={2} />
-      </Box>
+      </mesh>
 
+      {/* Text Info */}
       <group position={offsetPos}>
         <Text color="#ffffff" fontSize={0.35} anchorX={textAlign} position={[0, 0.4, 0]}>
           {point.year}
@@ -35,23 +37,33 @@ function TimelinePointItem({ point }: { point: WorkTimelinePoint }) {
   );
 }
 
+function NativeLine({ points }: { points: THREE.Vector3[] }) {
+  const lineObject = useMemo(() => {
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    const material = new THREE.LineBasicMaterial({ color: '#EAB308', linewidth: 3 });
+    return new THREE.Line(geometry, material);
+  }, [points]);
+
+  return <primitive object={lineObject} />;
+}
+
 function Track3D() {
   const scrollData = useScroll();
   const timeline = useMemo(() => WORK_TIMELINE, []);
-  
+
   const curve = useMemo(
     () => new THREE.CatmullRomCurve3(timeline.map((p) => new THREE.Vector3(...p.point)), false),
     [timeline]
   );
-  
-  const curvePoints = useMemo(() => curve.getPoints(300), [curve]);
+
+  const curvePoints = useMemo(() => curve.getPoints(200), [curve]);
 
   useFrame(({ camera }, delta) => {
     if (scrollData) {
       const p = Math.min(Math.max(scrollData.range(0, 1), 0), 1);
       const targetPos = curve.getPoint(p);
 
-      // Smooth camera motion along curve
+      // Smooth camera interpolation
       camera.position.x = THREE.MathUtils.damp(camera.position.x, targetPos.x, 4, delta);
       camera.position.y = THREE.MathUtils.damp(camera.position.y, targetPos.y + 1, 4, delta);
       camera.position.z = THREE.MathUtils.damp(camera.position.z, targetPos.z + 5, 4, delta);
@@ -61,7 +73,7 @@ function Track3D() {
 
   return (
     <group position={[0, 0, 0]}>
-      <Line points={curvePoints} color="#EAB308" lineWidth={3} />
+      <NativeLine points={curvePoints} />
       {timeline.map((point, i) => (
         <TimelinePointItem key={i} point={point} />
       ))}
