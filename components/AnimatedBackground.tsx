@@ -6,19 +6,15 @@ import { Application, SplineEvent } from "@splinetool/runtime";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SKILLS, Skill, SkillNames } from "../app/src/data/constants";
-import { Section, getKeyboardState } from "./animated-background-config";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function AnimatedBackground({ onLoaded }: { onLoaded?: () => void }) {
   const [splineApp, setSplineApp] = useState<Application | null>(null);
-  const [activeSection, setActiveSection] = useState<Section | null>(null);
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
-  
-  const bongoIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+  const bongoIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Handle Keycap Clicks / Hovers
+  // Handle Keycap Clicks
   const handleMouseHover = (e: SplineEvent) => {
     if (!splineApp) return;
     const skill = SKILLS[e.target.name as SkillNames];
@@ -31,125 +27,70 @@ export default function AnimatedBackground({ onLoaded }: { onLoaded?: () => void
     }
   };
 
-  // Bongo Cat Animation (Resets Scale & Uniform Proportions)
-  const startBongoCat = () => {
+  // Continuous Full Rotation Setup starting at #photos (Card Stack) with no upper limit
+  useEffect(() => {
     if (!splineApp) return;
+
+    const kbd = splineApp.findObjectByName("keyboard");
     const bongoCat = splineApp.findObjectByName("bongo-cat");
     const frame1 = splineApp.findObjectByName("frame-1");
     const frame2 = splineApp.findObjectByName("frame-2");
 
-    if (!bongoCat || !frame1 || !frame2) return;
-    
-    bongoCat.visible = true;
-    
-    // Reset scale vector to prevent distortion stretched shapes
-    if (bongoCat.scale) {
-      bongoCat.scale.x = 0.8;
-      bongoCat.scale.y = 0.8;
-      bongoCat.scale.z = 0.8;
+    if (!kbd) return;
+
+    kbd.visible = true;
+
+    if (bongoCat && frame1 && frame2) {
+      bongoCat.visible = true;
+      let i = 0;
+      if (bongoIntervalRef.current) clearInterval(bongoIntervalRef.current);
+      bongoIntervalRef.current = setInterval(() => {
+        if (i % 2 === 0) {
+          frame1.visible = true;
+          frame2.visible = false;
+        } else {
+          frame1.visible = false;
+          frame2.visible = true;
+        }
+        i++;
+      }, 120);
     }
-    if (bongoCat.position) {
-      bongoCat.position.y = 110;
-      bongoCat.position.z = 10;
-    }
 
-    let i = 0;
-    if (bongoIntervalRef.current) clearInterval(bongoIntervalRef.current);
-    bongoIntervalRef.current = setInterval(() => {
-      if (i % 2 === 0) {
-        frame1.visible = true;
-        frame2.visible = false;
-      } else {
-        frame1.visible = false;
-        frame2.visible = true;
-      }
-      i++;
-    }, 130);
-  };
-
-  const stopBongoCat = () => {
-    if (bongoIntervalRef.current) clearInterval(bongoIntervalRef.current);
-    if (!splineApp) return;
-    const bongoCat = splineApp.findObjectByName("bongo-cat");
-    if (bongoCat) bongoCat.visible = false;
-  };
-
-  // Floating Keycap Animation
-  const startKeycapFloating = () => {
-    if (!splineApp) return;
+    // Keycaps floating animation
     Object.values(SKILLS).forEach((skill, idx) => {
       const keycap = splineApp.findObjectByName(skill.name);
       if (keycap) {
         gsap.to(keycap.position, {
-          y: Math.random() * 60 + 60,
+          y: Math.random() * 80 + 80,
           duration: Math.random() * 2 + 1.5,
-          delay: idx * 0.08,
+          delay: idx * 0.05,
           repeat: -1,
           yoyo: true,
           ease: "sine.inOut",
         });
       }
     });
-  };
 
-  const stopKeycapFloating = () => {
-    if (!splineApp) return;
-    Object.values(SKILLS).forEach((skill) => {
-      const keycap = splineApp.findObjectByName(skill.name);
-      if (keycap) {
-        gsap.to(keycap.position, { y: 0, duration: 1, ease: "power2.out" });
-      }
-    });
-  };
-
-  useEffect(() => {
-    if (!splineApp) return;
-
-    const kbd = splineApp.findObjectByName("keyboard");
-    if (!kbd) return;
-
-    const photosState = getKeyboardState({ section: "photos", isMobile });
-    gsap.set(kbd.scale, photosState.scale);
-    gsap.set(kbd.position, photosState.position);
-    gsap.set(kbd.rotation, photosState.rotation);
-
-    const triggerStack = ScrollTrigger.create({
-      trigger: "#stack",
-      start: "top 70%",
-      end: "bottom 30%",
-      onEnter: () => {
-        setActiveSection("stack");
-        const state = getKeyboardState({ section: "stack", isMobile });
-        gsap.to(kbd.scale, { ...state.scale, duration: 1.2, ease: "power2.out" });
-        gsap.to(kbd.position, { ...state.position, duration: 1.2, ease: "power2.out" });
-        // Clean non-distorting isometric angle
-        gsap.to(kbd.rotation, { x: 0.25, y: Math.PI / 5, z: 0, duration: 1.2, ease: "power2.out" });
-      },
-      onLeaveBack: () => {
-        setActiveSection("photos");
-        const state = getKeyboardState({ section: "photos", isMobile });
-        gsap.to(kbd.scale, { ...state.scale, duration: 1.2, ease: "power2.out" });
-        gsap.to(kbd.position, { ...state.position, duration: 1.2, ease: "power2.out" });
-        gsap.to(kbd.rotation, { ...state.rotation, duration: 1.2, ease: "power2.out" });
+    // Continuous 360 Scroll Spin starting from Card Stack (#photos)
+    const st = ScrollTrigger.create({
+      trigger: "#photos",
+      start: "top bottom",
+      end: "max",
+      scrub: 1,
+      onUpdate: (self) => {
+        kbd.rotation.y = self.progress * Math.PI * 4;
+        kbd.rotation.x = Math.sin(self.progress * Math.PI * 2) * 0.4 + 0.2;
+        kbd.rotation.z = Math.cos(self.progress * Math.PI * 2) * 0.2;
       },
     });
 
     splineApp.addEventListener("mouseHover", handleMouseHover);
 
     return () => {
-      triggerStack.kill();
+      st.kill();
+      if (bongoIntervalRef.current) clearInterval(bongoIntervalRef.current);
     };
-  }, [splineApp, isMobile]);
-
-  useEffect(() => {
-    if (activeSection === "stack") {
-      startBongoCat();
-      startKeycapFloating();
-    } else {
-      stopBongoCat();
-      stopKeycapFloating();
-    }
-  }, [activeSection, splineApp]);
+  }, [splineApp]);
 
   function onLoad(app: Application) {
     setSplineApp(app);

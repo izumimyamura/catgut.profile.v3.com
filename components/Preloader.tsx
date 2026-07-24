@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import gsap from 'gsap';
 
 const GREETINGS = [
   { word: "வணக்கம்", lang: "Tamil" },
@@ -17,33 +18,42 @@ const GREETINGS = [
 
 export default function Preloader({ onComplete }: { onComplete?: () => void }) {
   const [index, setIndex] = useState(0);
-  const [isExiting, setIsExiting] = useState(false);
-  const [fade, setFade] = useState(true);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
     if (index < GREETINGS.length - 1) {
       const timer = setTimeout(() => {
-        setFade(false);
-        setTimeout(() => {
-          setIndex((prev) => prev + 1);
-          setFade(true);
-        }, 50);
-      }, 220); // Smooth greeting switch
+        if (textRef.current) {
+          gsap.fromTo(
+            textRef.current,
+            { y: 30, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.18, ease: "power2.out" }
+          );
+        }
+        setIndex((prev) => prev + 1);
+      }, 200);
       return () => clearTimeout(timer);
     } else {
-      // Hold on English briefly, then slide up cleanly
       const exitTimer = setTimeout(() => {
-        setIsExiting(true);
-        setTimeout(() => {
-          if (onComplete) onComplete();
-        }, 800);
-      }, 500);
+        if (containerRef.current) {
+          gsap.to(containerRef.current, {
+            y: "-100vh",
+            duration: 0.8,
+            ease: "power4.inOut",
+            onComplete: () => {
+              if (onComplete) onComplete();
+            },
+          });
+        }
+      }, 400);
       return () => clearTimeout(exitTimer);
     }
   }, [index, onComplete]);
 
   return (
     <div
+      ref={containerRef}
       style={{
         position: 'fixed',
         inset: 0,
@@ -53,32 +63,27 @@ export default function Preloader({ onComplete }: { onComplete?: () => void }) {
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'column',
-        transform: isExiting ? 'translateY(-100vh)' : 'translateY(0)',
-        transition: 'transform 0.8s cubic-bezier(0.76, 0, 0.24, 1)',
-        pointerEvents: isExiting ? 'none' : 'auto',
       }}
     >
       <div
         style={{
           position: 'relative',
           overflow: 'hidden',
-          height: '80px',
+          height: '100px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
         <p
+          ref={textRef}
           style={{
-            fontSize: 'clamp(2.2rem, 5vw, 4rem)',
+            fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
             fontWeight: 800,
             color: '#fff',
             margin: 0,
             letterSpacing: '-0.02em',
             fontFamily: 'sans-serif',
-            opacity: fade ? 1 : 0,
-            transform: fade ? 'translateY(0)' : 'translateY(20px)',
-            transition: 'opacity 0.15s ease, transform 0.15s ease',
           }}
         >
           • {GREETINGS[index].word}
