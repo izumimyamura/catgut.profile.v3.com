@@ -10,14 +10,13 @@ function TimelinePointItem({ point }: { point: WorkTimelinePoint }) {
   const groupRef = useRef<THREE.Group>(null);
   const isLeft = point.position === 'left';
   const textAlign = isLeft ? 'right' : 'left';
-  const textX = isLeft ? -0.5 : 0.5;
+  const textX = isLeft ? -0.6 : 0.6;
 
   useFrame(({ camera }) => {
     if (groupRef.current) {
-      // Calculate distance between camera and point for distance fading
+      // Calculate distance between camera and point for smooth distance fading
       const dist = camera.position.distanceTo(groupRef.current.position);
-      // Fade out labels if too far or past camera
-      const opacity = THREE.MathUtils.clamp(1 - Math.abs(dist - 6) / 8, 0, 1);
+      const opacity = THREE.MathUtils.clamp(1 - Math.abs(dist - 6) / 10, 0, 1);
       
       groupRef.current.children.forEach((child) => {
         if ('material' in child && child.material) {
@@ -30,42 +29,47 @@ function TimelinePointItem({ point }: { point: WorkTimelinePoint }) {
 
   return (
     <group ref={groupRef} position={point.point}>
-      {/* 3D Glowing Wireframe Box */}
+      {/* 3D Wireframe Indicator Box */}
       <mesh position={[0, 0, 0]}>
         <boxGeometry args={[0.3, 0.3, 0.3]} />
         <meshBasicMaterial color="#EAB308" wireframe />
       </mesh>
 
-      {/* Year */}
+      {/* Year (Positioned above title) */}
       <Text
         font="/Vercetti-Regular.woff"
-        fontSize={0.35}
+        fontSize={0.3}
         color="#ffffff"
         anchorX={textAlign}
-        position={[textX, 0.4, 0]}
+        anchorY="bottom"
+        position={[textX, 0.65, 0]}
       >
         {point.year}
       </Text>
 
-      {/* Title */}
+      {/* Title (Centered vertically relative to the point) */}
       <Text
         font="/soria-font.ttf"
-        fontSize={0.55}
+        fontSize={0.5}
         color="#EAB308"
         maxWidth={3.5}
         anchorX={textAlign}
-        position={[textX, 0, 0]}
+        anchorY="middle"
+        lineHeight={1.1}
+        position={[textX, 0.1, 0]}
       >
         {point.title}
       </Text>
 
-      {/* Subtitle */}
+      {/* Subtitle (Positioned below title with top anchoring) */}
       <Text
         font="/Vercetti-Regular.woff"
-        fontSize={0.22}
+        fontSize={0.2}
         color="#a1a1aa"
         maxWidth={3.5}
         anchorX={textAlign}
+        anchorY="top"
+        lineHeight={1.3}
         position={[textX, -0.45, 0]}
       >
         {point.subtitle}
@@ -104,7 +108,6 @@ function Track3D() {
     const targetPos = curve.getPoint(p);
 
     if (targetPos && !isNaN(targetPos.x) && !isNaN(targetPos.y) && !isNaN(targetPos.z)) {
-      // Smooth camera motion along curve
       camera.position.x = THREE.MathUtils.damp(camera.position.x, targetPos.x, 3, delta);
       camera.position.y = THREE.MathUtils.damp(camera.position.y, targetPos.y + 0.5, 3, delta);
       camera.position.z = THREE.MathUtils.damp(camera.position.z, targetPos.z + 6, 3, delta);
