@@ -112,7 +112,7 @@ export default function InteractiveTerminal({ title, codeSnippet }: { title: str
   const [active, setActive] = useState<boolean>(true);
 
   useEffect(() => {
-    const timer = setInterval(() => setActive(prev => !prev), 10000);
+    const timer = setInterval(() => setActive(prev => !prev), 20000);
     return () => clearInterval(timer);
   }, []);
 
@@ -285,10 +285,11 @@ function SingleTerminalBox({ item }: { item: TechItem }) {
     }
   }, [showCode, item.codeSnippet]);
 
+  // Updated timer to 20000ms (20 seconds)
   useEffect(() => {
     const cycleInterval = setInterval(() => {
       setShowCode((prev) => !prev);
-    }, 10000);
+    }, 20000);
 
     return () => clearInterval(cycleInterval);
   }, []);
@@ -402,7 +403,7 @@ function SingleTerminalBox({ item }: { item: TechItem }) {
         }}
       >
         <span>STATUS: ACTIVE</span>
-        <span style={{ color: '#EAB308', fontWeight: 600 }}>AUTO-SWITCHING (10s)</span>
+        <span style={{ color: '#EAB308', fontWeight: 600 }}>AUTO-SWITCHING (20s)</span>
       </div>
     </div>
   );
