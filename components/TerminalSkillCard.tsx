@@ -44,7 +44,6 @@ const LANGUAGES: TechItem[] = [
   flex-direction: column;
   background: rgba(10, 10, 14, 0.94);
   backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 28px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
@@ -260,6 +259,55 @@ def process_video_metadata(directory_path: str):
   },
 ];
 
+// Lightweight VS Code / Xcode Syntax Highlighter Tokenizer
+function highlightCode(code: string) {
+  if (!code) return null;
+
+  // Token patterns
+  const tokenRegex = /(?:\/\/[^\n]*|\/\*[\s\S]*?\*\/|--[^\n]*|#[^\n]*)|(?:"(?:\\.|[^\\"])*"|'(?:\\.|[^\\'])*'|`(?:\\.|[^\\`])*`)|(?:\b(?:import|export|from|default|function|return|const|let|var|interface|type|class|public|private|virtual|struct|typedef|include|SELECT|FROM|WHERE|GROUP|BY|HAVING|ORDER|COUNT|SUM|INNER|JOIN|AS|ON|void|int|boolean|bool|try|catch|throw|new|await|async|if|else|while|for|def|typedef|override|final)\b)|(?:\b(?:string|number|boolean|List|Node|std|vector|unique_ptr|html|head|body|header|h1|p|div|span|meta|title|DOCTYPE|doctype)\b)|(?:\b\d+\b)|([a-zA-Z_$][a-zA-Z0-9_$]*(?=\s*\())/g;
+
+  const elements: React.ReactNode[] = [];
+  let lastIndex = 0;
+
+  code.replace(tokenRegex, (match, fnName, offset) => {
+    // Push plain text before token
+    if (offset > lastIndex) {
+      elements.push(<span key={`text-${lastIndex}`}>{code.substring(lastIndex, offset)}</span>);
+    }
+
+    let color = '#d4d4d8'; // Default foreground (VS Code light grey)
+
+    if (match.startsWith('//') || match.startsWith('/*') || match.startsWith('--') || (match.startsWith('#') && !match.startsWith('#include'))) {
+      color = '#6A9955'; // Comments (Green)
+    } else if (match.startsWith('"') || match.startsWith("'") || match.startsWith('`')) {
+      color = '#CE9178'; // Strings (Coral / Orange)
+    } else if (/^(import|export|from|default|function|return|const|let|var|interface|type|class|public|private|virtual|struct|typedef|include|SELECT|FROM|WHERE|GROUP|BY|HAVING|ORDER|COUNT|SUM|INNER|JOIN|AS|ON|void|int|boolean|bool|try|catch|throw|new|await|async|if|else|while|for|def|override|final)$/.test(match)) {
+      color = '#569CD6'; // Keywords (VS Code Blue)
+    } else if (/^(string|number|boolean|List|Node|std|vector|unique_ptr|html|head|body|header|h1|p|div|span|meta|title|DOCTYPE|doctype)$/.test(match)) {
+      color = '#4EC9B0'; // Types & HTML Elements (VS Code Teal)
+    } else if (/^\d+$/.test(match)) {
+      color = '#B5CEA8'; // Numbers (VS Code Soft Green)
+    } else if (fnName) {
+      color = '#DCDCAA'; // Function names (VS Code Yellow)
+    }
+
+    elements.push(
+      <span key={`token-${offset}`} style={{ color }}>
+        {match}
+      </span>
+    );
+
+    lastIndex = offset + match.length;
+    return match;
+  });
+
+  if (lastIndex < code.length) {
+    elements.push(<span key={`text-end`}>{code.substring(lastIndex)}</span>);
+  }
+
+  return elements;
+}
+
 function SingleTerminalBox({ item }: { item: TechItem }) {
   const [showCode, setShowCode] = useState(true);
   const [displayedCode, setDisplayedCode] = useState('');
@@ -279,13 +327,12 @@ function SingleTerminalBox({ item }: { item: TechItem }) {
           setIsTyping(false);
           clearInterval(typingInterval);
         }
-      }, 15);
+      }, 12);
 
       return () => clearInterval(typingInterval);
     }
   }, [showCode, item.codeSnippet]);
 
-  // Updated timer to 20000ms (20 seconds)
   useEffect(() => {
     const cycleInterval = setInterval(() => {
       setShowCode((prev) => !prev);
@@ -298,16 +345,17 @@ function SingleTerminalBox({ item }: { item: TechItem }) {
     <div
       style={{
         width: '100%',
-        maxWidth: '1000px',
-        minHeight: '440px',
-        margin: '0 auto 3rem auto',
-        backgroundColor: 'rgba(10, 10, 14, 0.94)',
-        backdropFilter: 'blur(24px)',
-        WebkitBackdropFilter: 'blur(24px)',
+        maxWidth: '920px',
+        minHeight: '380px',
+        maxHeight: '480px',
+        margin: '0 auto 2.5rem auto',
+        backgroundColor: 'rgba(12, 12, 16, 0.96)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
         border: '1px solid rgba(255, 255, 255, 0.12)',
-        borderRadius: '28px',
+        borderRadius: '24px',
         overflow: 'hidden',
-        boxShadow: '0 20px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(234, 179, 8, 0.05)',
+        boxShadow: '0 20px 45px rgba(0, 0, 0, 0.8), 0 0 25px rgba(234, 179, 8, 0.05)',
         display: 'flex',
         flexDirection: 'column',
         position: 'relative',
@@ -319,30 +367,30 @@ function SingleTerminalBox({ item }: { item: TechItem }) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '0.8rem 1.4rem',
-          backgroundColor: 'rgba(18, 18, 22, 0.98)',
+          padding: '0.7rem 1.2rem',
+          backgroundColor: 'rgba(20, 20, 26, 0.98)',
           borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
         }}
       >
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <span style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#ff5f56', display: 'inline-block' }}></span>
-          <span style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#ffbd2e', display: 'inline-block' }}></span>
-          <span style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#27c93f', display: 'inline-block' }}></span>
+          <span style={{ width: '11px', height: '11px', borderRadius: '50%', backgroundColor: '#ff5f56', display: 'inline-block' }}></span>
+          <span style={{ width: '11px', height: '11px', borderRadius: '50%', backgroundColor: '#ffbd2e', display: 'inline-block' }}></span>
+          <span style={{ width: '11px', height: '11px', borderRadius: '50%', backgroundColor: '#27c93f', display: 'inline-block' }}></span>
         </div>
 
-        <div style={{ fontSize: '0.9rem', color: '#EAB308', fontFamily: 'monospace', fontWeight: 700 }}>
+        <div style={{ fontSize: '0.82rem', color: '#EAB308', fontFamily: 'monospace', fontWeight: 700 }}>
           {item.filename}
         </div>
 
         <button
           onClick={() => setShowCode(!showCode)}
           style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            backgroundColor: 'rgba(255, 255, 255, 0.08)',
             color: '#fff',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
+            border: '1px solid rgba(255, 255, 255, 0.18)',
             borderRadius: '999px',
-            padding: '0.35rem 1rem',
-            fontSize: '0.75rem',
+            padding: '0.3rem 0.9rem',
+            fontSize: '0.72rem',
             fontWeight: 700,
             cursor: 'pointer',
             transition: 'all 0.2s ease',
@@ -352,57 +400,67 @@ function SingleTerminalBox({ item }: { item: TechItem }) {
         </button>
       </div>
 
-      {/* Main Content Area */}
-      <div style={{ flex: 1, padding: '2.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      {/* Main Terminal Window with Strict Size Bounds & Auto Scroll */}
+      <div
+        style={{
+          flex: 1,
+          padding: '1.5rem',
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'flex-start',
+          overflowX: 'auto',
+          overflowY: 'auto',
+        }}
+      >
         {showCode ? (
-          <div
+          <pre
             style={{
               width: '100%',
-              height: '100%',
+              margin: 0,
               fontFamily: 'Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
-              fontSize: '0.95rem',
-              lineHeight: 1.6,
-              color: '#38bdf8',
-              whiteSpace: 'pre-wrap',
+              fontSize: '0.78rem', // Tiny VS Code editor font size to prevent layout breaking
+              lineHeight: 1.5,
+              whiteSpace: 'pre',
+              wordBreak: 'normal',
               textAlign: 'left',
-              animation: 'fadeIn 0.4s ease',
+              animation: 'fadeIn 0.3s ease',
             }}
           >
             <code>
-              {displayedCode}
+              {highlightCode(displayedCode)}
               {isTyping && <span style={{ color: '#EAB308', fontWeight: 'bold' }}>|</span>}
             </code>
-          </div>
+          </pre>
         ) : (
-          <div style={{ textAlign: 'left', width: '100%', animation: 'fadeIn 0.4s ease' }}>
-            <span style={{ color: '#EAB308', fontSize: '0.85rem', fontWeight: 800, letterSpacing: '0.18em', textTransform: 'uppercase' }}>
+          <div style={{ textAlign: 'left', width: '100%', padding: '1rem', animation: 'fadeIn 0.3s ease' }}>
+            <span style={{ color: '#EAB308', fontSize: '0.8rem', fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase' }}>
               {item.language}
             </span>
-            <h3 style={{ fontSize: '2.2rem', fontWeight: 900, color: '#fff', margin: '0.6rem 0 1rem 0' }}>
+            <h3 style={{ fontSize: '1.8rem', fontWeight: 900, color: '#fff', margin: '0.5rem 0 0.8rem 0' }}>
               {item.title}
             </h3>
-            <p style={{ color: '#d4d4d8', fontSize: '1.2rem', lineHeight: 1.7, margin: 0 }}>
+            <p style={{ color: '#d4d4d8', fontSize: '1.05rem', lineHeight: 1.6, margin: 0, maxWidth: '750px' }}>
               {item.description}
             </p>
           </div>
         )}
       </div>
 
-      {/* Footer Bar */}
+      {/* Status Footer Bar */}
       <div
         style={{
-          padding: '0.6rem 1.4rem',
+          padding: '0.5rem 1.2rem',
           backgroundColor: 'rgba(15, 15, 18, 0.95)',
           borderTop: '1px solid rgba(255, 255, 255, 0.08)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          fontSize: '0.78rem',
+          fontSize: '0.72rem',
           color: '#71717a',
           fontFamily: 'monospace',
         }}
       >
-        <span>STATUS: ACTIVE</span>
+        <span>FILE: {item.filename}</span>
         <span style={{ color: '#EAB308', fontWeight: 600 }}>AUTO-SWITCHING (20s)</span>
       </div>
     </div>
