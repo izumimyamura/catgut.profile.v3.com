@@ -13,6 +13,7 @@ const TerminalSkillCard = dynamic(() => import('../components/TerminalSkillCard'
 const TextScramble = dynamic(() => import('../components/TextScramble'), { ssr: false });
 const HorizontalWords = dynamic(() => import('../components/HorizontalWords'), { ssr: false });
 const TruusMotionSection = dynamic(() => import('../components/TruusMotionSection'), { ssr: false });
+const Footer = dynamic(() => import('../components/Footer'), { ssr: false });
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
@@ -264,11 +265,8 @@ export default function Home() {
       {/* TRUUS-STYLE POOKIE/GOOFY MOTION & EDITING SECTION */}
       <TruusMotionSection />
 
-      {/* FOOTER */}
-      <footer style={{ width: '100vw', padding: '10vh 0', backgroundColor: '#f0ebe6', color: '#1a1a1a', borderTop: '1px solid rgba(0,0,0,0.08)', textAlign: 'center', position: 'relative', zIndex: 20 }}>
-        <h2 style={{ fontSize: 'clamp(2rem, 5vw, 4rem)', fontWeight: 900, marginBottom: '1.5rem' }}>Ready to cut?</h2>
-        <a href="https://www.instagram.com/thecatguy.editz/" target="_blank" rel="noreferrer" style={{ display: 'block', color: '#f5693c', fontSize: '1.4rem', textDecoration: 'none', fontWeight: 800 }}>@thecatguy.editz</a>
-      </footer>
+      {/* TRUUS-STYLE BLUE FOOTER WITH GIANT WORDMARK & CREDITS POPUP */}
+      <Footer />
 
     </main>
   );
