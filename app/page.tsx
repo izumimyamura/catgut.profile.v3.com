@@ -12,6 +12,7 @@ const Card = dynamic(() => import('../components/CardSwap').then(mod => mod.Card
 const AnimatedBackground = dynamic(() => import('../components/AnimatedBackground'), { ssr: false });
 const TerminalSkillCard = dynamic(() => import('../components/TerminalSkillCard'), { ssr: false });
 const TextScramble = dynamic(() => import('../components/TextScramble'), { ssr: false });
+const EditingShowcaseTunnel = dynamic(() => import('../components/EditingShowcaseTunnel'), { ssr: false });
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
@@ -117,15 +118,16 @@ export default function Home() {
         }
       `}} />
 
-      {/* Navigation */}
+      {/* Navigation Header */}
       <nav style={{ position: 'fixed', top: 0, left: 0, width: '100%', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.2rem 2.5rem', backgroundColor: 'rgba(0, 0, 0, 0.4)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
         <div style={{ fontSize: '1.2rem', fontWeight: 800, letterSpacing: '0.15em' }}>THE CAT GUY</div>
-        <div style={{ display: 'flex', gap: '3rem', fontSize: '0.9rem', fontWeight: 500 }}>
+        <div style={{ display: 'flex', gap: '2.5rem', fontSize: '0.9rem', fontWeight: 500 }}>
           <a href="#hero" style={{ color: '#e5e5e5', textDecoration: 'none' }}>Home</a>
           <a href="#projects" style={{ color: '#e5e5e5', textDecoration: 'none' }}>Projects</a>
           <a href="#photos" style={{ color: '#e5e5e5', textDecoration: 'none' }}>Photography</a>
           <a href="#stack" style={{ color: '#e5e5e5', textDecoration: 'none' }}>My Stack</a>
           <a href="#webdev" style={{ color: '#EAB308', textDecoration: 'none' }}>Web Dev</a>
+          <a href="#motion-skills" style={{ color: '#e5e5e5', textDecoration: 'none' }}>Motion Suite</a>
         </div>
         <a href="mailto:kavin123kavinl123@gmail.com" style={{ backgroundColor: '#fff', color: '#000', padding: '0.6rem 1.5rem', borderRadius: '9999px', fontSize: '0.9rem', fontWeight: 700, textDecoration: 'none' }}>Hire Me</a>
       </nav>
@@ -149,7 +151,7 @@ export default function Home() {
       <section id="projects" style={{ width: '100vw', position: 'relative', zIndex: 10, paddingTop: '12vh', paddingBottom: '12vh' }}>
         <div style={{ textAlign: 'center', paddingBottom: '4vh' }}>
           <h2 style={{ fontSize: 'clamp(3rem, 6vw, 6rem)', fontWeight: 900, letterSpacing: '-0.04em', margin: 0 }}>
-            <TextScramble text="Some of my projects." fromLang="japanese" />
+            <TextScramble text="Some of my projects." fromLang="japanese" speed={18} />
           </h2>
           <p style={{ color: '#a1a1aa', fontSize: 'clamp(1.2rem, 2vw, 1.5rem)', marginTop: '1rem', fontWeight: 500 }}>Retention-focused edits. Swipe or click to explore.</p>
         </div>
@@ -204,10 +206,10 @@ export default function Home() {
         <div className="split-container" style={{ display: 'flex', width: '100%', maxWidth: '1400px', margin: '0 auto', alignItems: 'center' }}>
           <div className="split-text" style={{ flex: '1 1 400px', paddingLeft: '5vw', zIndex: 30 }}>
             <h2 style={{ fontSize: 'clamp(3rem, 5vw, 4.5rem)', fontWeight: 500, letterSpacing: '-0.02em', margin: 0, lineHeight: 1.1 }}>
-              <TextScramble text="Card stacks have never looked so good" fromLang="tamil" />
+              <TextScramble text="Card stacks have never looked so good" fromLang="tamil" speed={18} />
             </h2>
             <p style={{ color: '#71717a', fontSize: '1.5rem', marginTop: '1.5rem', fontWeight: 400 }}>
-              <TextScramble text="Just look at it go!" fromLang="tamil" />
+              <TextScramble text="Just look at it go!" fromLang="tamil" speed={18} />
             </p>
           </div>
 
@@ -244,7 +246,7 @@ export default function Home() {
         <p style={{ color: '#a1a1aa', fontSize: '1.3rem', marginTop: '1rem', textAlign: 'center' }}>Click keycaps directly on the 3D keyboard to view details.</p>
       </section>
 
-      {/* WEB DEVELOPMENT SKILLS SECTION */}
+      {/* WEB DEVELOPMENT SKILLS SECTION (Stacked Terminal Windows with 20s auto-switch) */}
       <section id="webdev" style={{ width: '100vw', backgroundColor: 'rgba(0,0,0,0.85)', position: 'relative', zIndex: 10, padding: '15vh 2rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
         <div style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto 4rem auto' }}>
           <span style={{ color: '#EAB308', fontSize: '0.9rem', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase' }}>Full Stack Capabilities</span>
@@ -256,8 +258,11 @@ export default function Home() {
         <TerminalSkillCard />
       </section>
 
+      {/* 3D TUNNEL SHOWCASE FOR VIDEO EDITING & MOTION DESIGN */}
+      <EditingShowcaseTunnel />
+
       {/* FOOTER */}
-      <footer style={{ width: '100vw', padding: '10vh 0', borderTop: '1px solid rgba(255,255,255,0.05)', textAlign: 'center', position: 'relative', zIndex: 10 }}>
+      <footer style={{ width: '100vw', padding: '10vh 0', backgroundColor: '#000', borderTop: '1px solid rgba(255,255,255,0.05)', textAlign: 'center', position: 'relative', zIndex: 10 }}>
         <h2 style={{ fontSize: 'clamp(2rem, 5vw, 4rem)', fontWeight: 900, marginBottom: '2rem' }}>Ready to cut?</h2>
         <a href="https://www.instagram.com/thecatguy.editz/" target="_blank" rel="noreferrer" style={{ display: 'block', color: '#EAB308', fontSize: '1.2rem', textDecoration: 'none', marginBottom: '1rem', fontWeight: 600 }}>@thecatguy.editz</a>
       </footer>
