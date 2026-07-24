@@ -313,6 +313,96 @@ function Marquee() {
   );
 }
 
+/* --- Custom Neo-Brutalist Footer --- */
+function Footer() {
+  return (
+    <footer className="bg-[#050505] text-[#e1e1e1] relative overflow-hidden pt-24 pb-12 border-t border-zinc-800">
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
+        
+        {/* Call to Action Callout */}
+        <div className="mb-28 flex flex-col items-center text-center">
+          <h3 className="text-[5vw] leading-none mb-6 font-serif italic text-gray-300 font-normal">
+            Have an idea?
+          </h3>
+          <a
+            href="mailto:kavin123kavinl123@gmail.com"
+            className="text-[8vw] md:text-[10vw] font-black leading-none text-transparent transition-colors duration-300 hover:text-yellow-500"
+            style={{ WebkitTextStroke: '1px rgba(255, 255, 255, 0.4)' }}
+          >
+            LET'S TALK
+          </a>
+        </div>
+
+        {/* Sitemap & Info Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 border-t border-white/10 pt-16">
+          <div className="col-span-1 md:col-span-2">
+            <span className="text-3xl font-black tracking-tight block mb-6 text-white uppercase">
+              CATGUYEDITZ
+            </span>
+            <p className="max-w-sm text-gray-400 text-sm leading-relaxed font-mono">
+              Cinematic video editing firm under Heisenbergo Studio. Specializing in retention editing, color grading, and high-velocity motion visuals.
+            </p>
+          </div>
+
+          <div>
+            <h4 className="text-xs font-bold text-yellow-500 uppercase tracking-widest mb-6 font-mono">
+              Sitemap
+            </h4>
+            <ul className="space-y-3 text-gray-400 font-medium">
+              {['Projects', 'Process', 'Timeline', 'Services'].map((item) => (
+                <li key={item}>
+                  <a href={`#${item.toLowerCase()}`} className="hover:text-white transition-colors text-base">
+                    {item}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-xs font-bold text-yellow-500 uppercase tracking-widest mb-6 font-mono">
+              Connect
+            </h4>
+            <ul className="space-y-3 text-gray-400 font-medium">
+              <li>
+                <a href="https://www.instagram.com/thecatguy.editz/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors text-base">
+                  Instagram
+                </a>
+              </li>
+              <li>
+                <a href="https://github.com/izumimyamura" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors text-base">
+                  GitHub
+                </a>
+              </li>
+              <li>
+                <a href="mailto:kavin123kavinl123@gmail.com" className="hover:text-white transition-colors text-base">
+                  Email
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Bottom Credits Line */}
+        <div className="mt-28 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 uppercase tracking-widest border-t border-white/10 pt-8 font-mono">
+          <span>© 2026 CATGUYEDITZ • HEISENBERGO STUDIO</span>
+          <div className="flex gap-8 mt-4 md:mt-0">
+            <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+            <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+          </div>
+        </div>
+      </div>
+
+      {/* Giant Background Wordmark Watermark */}
+      <div className="absolute bottom-0 left-0 w-full overflow-hidden pointer-events-none opacity-[0.04] select-none">
+        <h1 className="text-[18vw] leading-[0.75] font-black text-center text-white uppercase tracking-tighter whitespace-nowrap translate-y-[15%]">
+          HEISENBERGO STUDIO
+        </h1>
+      </div>
+    </footer>
+  );
+}
+
 /* --- Main Page Export --- */
 export default function ProjectsPage() {
   useEffect(() => {
@@ -350,6 +440,8 @@ export default function ProjectsPage() {
         <Manifesto />
         <Marquee />
       </main>
+
+      <Footer />
     </div>
   );
 }
