@@ -13,6 +13,7 @@ const TerminalSkillCard = dynamic(() => import('../components/TerminalSkillCard'
 const TextScramble = dynamic(() => import('../components/TextScramble'), { ssr: false });
 const HorizontalWords = dynamic(() => import('../components/HorizontalWords'), { ssr: false });
 const TruusMotionSection = dynamic(() => import('../components/TruusMotionSection'), { ssr: false });
+const SoftwareBlurSlider = dynamic(() => import('../components/SoftwareBlurSlider'), { ssr: false });
 const Footer = dynamic(() => import('../components/Footer'), { ssr: false });
 
 export default function Home() {
@@ -130,6 +131,7 @@ export default function Home() {
           <a href="#stack" style={{ color: '#e5e5e5', textDecoration: 'none' }}>My Stack</a>
           <a href="#webdev" style={{ color: '#EAB308', textDecoration: 'none' }}>Web Dev</a>
           <a href="#motion-skills" style={{ color: '#e5e5e5', textDecoration: 'none' }}>Motion Suite</a>
+          <a href="#software-slider" style={{ color: '#e5e5e5', textDecoration: 'none' }}>Software</a>
           
           {/* Portfolio Link Button */}
           <a
@@ -199,7 +201,7 @@ export default function Home() {
             <div className="apple-slider-right">
               <h3 style={{ fontSize: '2.2rem', fontWeight: 800, margin: '0 0 1rem 0' }}>Cinematic Atmosphere</h3>
               <p style={{ color: '#a1a1aa', fontSize: '1.1rem', lineHeight: 1.6, marginBottom: '2rem' }}>Transforming raw footage into a moody, cinematic experience. Advanced color grading nodes mixed with environmental soundscapes.</p>
-              <a href="https://www.instagram.com/thecatguy.editz/" target="_blank" rel="noreferrer" style={{ display: 'inline-block', backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.2)', padding: '0.8rem 2rem', borderRadius: '999px', fontWeight :600, textDecoration: 'none', alignSelf: 'flex-start' }}>Watch on Instagram ↗</a>
+              <a href="https://www.instagram.com/thecatguy.editz/" target="_blank" rel="noreferrer" style={{ display: 'inline-block', backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.2)', padding: '0.8rem 2rem', borderRadius: '999px', fontWeight: 600, textDecoration: 'none', alignSelf: 'flex-start' }}>Watch on Instagram ↗</a>
             </div>
           </div>
 
@@ -271,9 +273,9 @@ export default function Home() {
       {/* WEB DEVELOPMENT SKILLS SECTION */}
       <section id="webdev" style={{ width: '100vw', backgroundColor: 'rgba(0,0,0,0.85)', position: 'relative', zIndex: 10, padding: '15vh 2rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
         <div style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto 4rem auto' }}>
-          <span style={{ color: '#EAB308', fontSize: '0.9rem', fontWeight :700, letterSpacing: '0.2em', textTransform: 'uppercase' }}>Full Stack Capabilities</span>
+          <span style={{ color: '#EAB308', fontSize: '0.9rem', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase' }}>Full Stack Capabilities</span>
           <h2 style={{ fontSize: 'clamp(2.5rem, 5vw, 4.5rem)', fontWeight: 900, margin: '0.8rem 0 0 0' }}>Web Development Skills</h2>
-          <p style={{ color: '#a1a1aa', fontSize: '1.2rem', marginTop: '1rem', lineHeight: 1.6 }}>Interactive VS Code terminal workspaces displaying code snippets with manual detail toggle.</p>
+          <p style={{ color: '#a1a1aa', fontSize: '1.2rem', marginTop: '1rem', lineHeight: 1.6 }}>Interactive VS Code terminal workspaces displaying skill details with manual syntax view toggle.</p>
         </div>
 
         {/* Stacked Terminal Windows for All Languages */}
@@ -285,6 +287,9 @@ export default function Home() {
 
       {/* TRUUS-STYLE MOTION & EDITING SECTION */}
       <TruusMotionSection />
+
+      {/* SWIPER BLUR SLIDER FOR EDITING SOFTWARE (WHITE BACKGROUND) */}
+      <SoftwareBlurSlider />
 
       {/* TRUUS-STYLE BLUE FOOTER WITH GIANT WORDMARK & CREDITS POPUP */}
       <Footer />
