@@ -2,7 +2,6 @@
 
 import { useState, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import Link from 'next/link';
 
 const Preloader = dynamic(() => import('../components/Preloader'), { ssr: false });
 const SideRays = dynamic(() => import('../components/SideRays'), { ssr: false });
@@ -12,7 +11,8 @@ const Card = dynamic(() => import('../components/CardSwap').then(mod => mod.Card
 const AnimatedBackground = dynamic(() => import('../components/AnimatedBackground'), { ssr: false });
 const TerminalSkillCard = dynamic(() => import('../components/TerminalSkillCard'), { ssr: false });
 const TextScramble = dynamic(() => import('../components/TextScramble'), { ssr: false });
-const EditingShowcaseTunnel = dynamic(() => import('../components/EditingShowcaseTunnel'), { ssr: false });
+const HorizontalWords = dynamic(() => import('../components/HorizontalWords'), { ssr: false });
+const TruusMotionSection = dynamic(() => import('../components/TruusMotionSection'), { ssr: false });
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
@@ -246,7 +246,7 @@ export default function Home() {
         <p style={{ color: '#a1a1aa', fontSize: '1.3rem', marginTop: '1rem', textAlign: 'center' }}>Click keycaps directly on the 3D keyboard to view details.</p>
       </section>
 
-      {/* WEB DEVELOPMENT SKILLS SECTION (Stacked Terminal Windows with 20s auto-switch) */}
+      {/* WEB DEVELOPMENT SKILLS SECTION (Stacked Terminal Windows) */}
       <section id="webdev" style={{ width: '100vw', backgroundColor: 'rgba(0,0,0,0.85)', position: 'relative', zIndex: 10, padding: '15vh 2rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
         <div style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto 4rem auto' }}>
           <span style={{ color: '#EAB308', fontSize: '0.9rem', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase' }}>Full Stack Capabilities</span>
@@ -258,13 +258,16 @@ export default function Home() {
         <TerminalSkillCard />
       </section>
 
-      {/* 3D TUNNEL SHOWCASE FOR VIDEO EDITING & MOTION DESIGN */}
-      <EditingShowcaseTunnel />
+      {/* SIDEWAYS SCROLLING WORDS: "we wanna be where the people are" */}
+      <HorizontalWords />
+
+      {/* TRUUS-STYLE POOKIE/GOOFY MOTION & EDITING SECTION */}
+      <TruusMotionSection />
 
       {/* FOOTER */}
-      <footer style={{ width: '100vw', padding: '10vh 0', backgroundColor: '#000', borderTop: '1px solid rgba(255,255,255,0.05)', textAlign: 'center', position: 'relative', zIndex: 10 }}>
-        <h2 style={{ fontSize: 'clamp(2rem, 5vw, 4rem)', fontWeight: 900, marginBottom: '2rem' }}>Ready to cut?</h2>
-        <a href="https://www.instagram.com/thecatguy.editz/" target="_blank" rel="noreferrer" style={{ display: 'block', color: '#EAB308', fontSize: '1.2rem', textDecoration: 'none', marginBottom: '1rem', fontWeight: 600 }}>@thecatguy.editz</a>
+      <footer style={{ width: '100vw', padding: '10vh 0', backgroundColor: '#f0ebe6', color: '#1a1a1a', borderTop: '1px solid rgba(0,0,0,0.08)', textAlign: 'center', position: 'relative', zIndex: 20 }}>
+        <h2 style={{ fontSize: 'clamp(2rem, 5vw, 4rem)', fontWeight: 900, marginBottom: '1.5rem' }}>Ready to cut?</h2>
+        <a href="https://www.instagram.com/thecatguy.editz/" target="_blank" rel="noreferrer" style={{ display: 'block', color: '#f5693c', fontSize: '1.4rem', textDecoration: 'none', fontWeight: 800 }}>@thecatguy.editz</a>
       </footer>
 
     </main>
