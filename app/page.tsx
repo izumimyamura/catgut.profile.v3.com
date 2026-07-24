@@ -126,7 +126,7 @@ export default function Home() {
         
         <div style={{ display: 'flex', gap: '2rem', alignItems: 'center', fontSize: '0.9rem', fontWeight: 500 }}>
           <a href="#hero" style={{ color: '#e5e5e5', textDecoration: 'none' }}>Home</a>
-          <a href="#projects" style={{ color: '#e5e5e5', textDecoration: 'none' }}>Projects</a>
+          <a href="/projects" style={{ color: '#e5e5e5', textDecoration: 'none' }}>Projects</a>
           <a href="#photos" style={{ color: '#e5e5e5', textDecoration: 'none' }}>Photography</a>
           <a href="#stack" style={{ color: '#e5e5e5', textDecoration: 'none' }}>My Stack</a>
           <a href="/timeline" style={{ color: '#EAB308', textDecoration: 'none', fontWeight: 700 }}>My Timeline</a>
@@ -201,7 +201,7 @@ export default function Home() {
             <div className="apple-slider-right">
               <h3 style={{ fontSize: '2.2rem', fontWeight: 800, margin: '0 0 1rem 0' }}>Cinematic Atmosphere</h3>
               <p style={{ color: '#a1a1aa', fontSize: '1.1rem', lineHeight: 1.6, marginBottom: '2rem' }}>Transforming raw footage into a moody, cinematic experience. Advanced color grading nodes mixed with environmental soundscapes.</p>
-              <a href="https://www.instagram.com/thecatguy.editz/" target="_blank" rel="noreferrer" style={{ display: 'inline-block', backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.2)', padding: '0.8rem 2rem', borderRadius: '999px', fontWeight:600, textDecoration: 'none', alignSelf: 'flex-start' }}>Watch on Instagram ↗</a>
+              <a href="https://www.instagram.com/thecatguy.editz/" target="_blank" rel="noreferrer" style={{ display: 'inline-block', backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.2)', padding: '0.8rem 2rem', borderRadius: '999px', fontWeight: 600, textDecoration: 'none', alignSelf: 'flex-start' }}>Watch on Instagram ↗</a>
             </div>
           </div>
 
