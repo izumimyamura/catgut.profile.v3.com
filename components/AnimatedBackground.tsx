@@ -14,7 +14,7 @@ export default function AnimatedBackground({ onLoaded }: { onLoaded?: () => void
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
   const bongoIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Keycap Mouse Interaction
+  // Handle Keycap Clicks & Hovers
   const handleMouseHover = (e: SplineEvent) => {
     if (!splineApp) return;
     const skill = SKILLS[e.target.name as SkillNames];
@@ -35,7 +35,7 @@ export default function AnimatedBackground({ onLoaded }: { onLoaded?: () => void
       const kbd = app.findObjectByName("keyboard");
       if (kbd) kbd.visible = true;
 
-      // Hide Bongo Cat by default on load (appears only at #stack)
+      // Keep Bongo Cat hidden at the start (Hero section)
       const bongoCat = app.findObjectByName("bongo-cat");
       if (bongoCat) bongoCat.visible = false;
     } catch (e) {}
@@ -51,7 +51,7 @@ export default function AnimatedBackground({ onLoaded }: { onLoaded?: () => void
 
     if (!kbd) return;
 
-    // Control Bongo Cat Typing Loop
+    // Start & Stop Bongo Cat Frame Loop
     const startBongoCat = () => {
       if (!bongoCat || !frame1 || !frame2) return;
       bongoCat.visible = true;
@@ -79,7 +79,7 @@ export default function AnimatedBackground({ onLoaded }: { onLoaded?: () => void
       const keycap = splineApp.findObjectByName(skill.name);
       if (keycap) {
         gsap.to(keycap.position, {
-          y: Math.random() * 40 + 40,
+          y: Math.random() * 50 + 50,
           duration: Math.random() * 2 + 1.5,
           delay: idx * 0.05,
           repeat: -1,
@@ -90,57 +90,70 @@ export default function AnimatedBackground({ onLoaded }: { onLoaded?: () => void
     });
 
     const ctx = gsap.context(() => {
-      // 1. Projects Section: Keyboard rotates slightly
-      ScrollTrigger.create({
-        trigger: "#projects",
-        start: "top 80%",
-        end: "bottom 20%",
-        scrub: 1.2,
-        onUpdate: (self) => {
-          kbd.rotation.y = self.progress * (Math.PI / 2);
-          kbd.rotation.x = Math.sin(self.progress * Math.PI) * 0.2;
+      // 1. Hero -> Projects: Smooth 90-degree profile spin
+      gsap.to(kbd.rotation, {
+        scrollTrigger: {
+          trigger: "#projects",
+          start: "top bottom",
+          end: "top top",
+          scrub: 1.2,
         },
+        x: 0.15,
+        y: Math.PI / 2,
+        z: -0.15,
+        ease: "none",
       });
 
-      // 2. Photos / Card Stack Section: Tilts isometric
-      ScrollTrigger.create({
-        trigger: "#photos",
-        start: "top 80%",
-        end: "bottom 20%",
-        scrub: 1.2,
-        onUpdate: (self) => {
-          kbd.rotation.y = (Math.PI / 2) + self.progress * (Math.PI / 2);
-          kbd.rotation.x = 0.2 + Math.cos(self.progress * Math.PI) * 0.15;
+      // 2. Projects -> Card Stack (#photos): Isometric angle behind cards
+      gsap.to(kbd.rotation, {
+        scrollTrigger: {
+          trigger: "#photos",
+          start: "top bottom",
+          end: "top top",
+          scrub: 1.2,
         },
+        x: 0.35,
+        y: Math.PI,
+        z: 0,
+        ease: "none",
       });
 
-      // 3. My Software Stack Section: Bongo Cat rotates into view!
+      // 3. Card Stack -> "My Software Stack" (#stack): Reveal Bongo Cat & rotate flat
       ScrollTrigger.create({
         trigger: "#stack",
-        start: "top 75%",
-        end: "bottom 25%",
-        scrub: 1.2,
-        onEnter: () => {
-          startBongoCat();
-        },
-        onLeaveBack: () => {
-          stopBongoCat();
-        },
-        onUpdate: (self) => {
-          kbd.rotation.y = Math.PI + self.progress * Math.PI;
-          kbd.rotation.x = 0.28;
-        },
+        start: "top 70%",
+        end: "bottom 30%",
+        onEnter: () => startBongoCat(),
+        onLeave: () => stopBongoCat(),
+        onEnterBack: () => startBongoCat(),
+        onLeaveBack: () => stopBongoCat(),
       });
 
-      // 4. Web Development Terminals Section
-      ScrollTrigger.create({
-        trigger: "#webdev",
-        start: "top 80%",
-        end: "bottom top",
-        scrub: 1.2,
-        onUpdate: (self) => {
-          kbd.rotation.y = Math.PI * 2 + self.progress * (Math.PI / 2);
+      gsap.to(kbd.rotation, {
+        scrollTrigger: {
+          trigger: "#stack",
+          start: "top bottom",
+          end: "center center",
+          scrub: 1.2,
         },
+        x: 0.3,
+        y: Math.PI * 1.5,
+        z: 0,
+        ease: "none",
+      });
+
+      // 4. "My Software Stack" -> Web Dev Terminals (#webdev): Final full spin
+      gsap.to(kbd.rotation, {
+        scrollTrigger: {
+          trigger: "#webdev",
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1.2,
+        },
+        x: 0.1,
+        y: Math.PI * 2,
+        z: 0,
+        ease: "none",
       });
     });
 
@@ -162,6 +175,7 @@ export default function AnimatedBackground({ onLoaded }: { onLoaded?: () => void
         />
       </Suspense>
 
+      {/* Selected Keycap Tooltip */}
       {selectedSkill && (
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 px-6 py-4 bg-black/85 border border-white/10 rounded-2xl text-center backdrop-blur-md max-w-md pointer-events-none shadow-2xl">
           <h4 className="text-yellow-500 font-bold text-lg mb-1">{selectedSkill.label}</h4>
