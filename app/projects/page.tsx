@@ -125,6 +125,7 @@ const horizontalProjects = [
   { id: 4, title: 'Horizontal Edit 04', cat: 'Cinematic Narrative', year: '2026', src: '/project4.mp4' },
   { id: 5, title: 'Horizontal Edit 05', cat: 'Commercial Promo', year: '2025', src: '/project5.mp4' },
   { id: 6, title: 'Horizontal Edit 06', cat: 'Film Production Cut', year: '2025', src: '/project6.mp4' },
+  { id: 7, title: 'Horizontal Edit 07', cat: 'Showcase Feature', year: '2026', src: '/project7.mp4' },
 ];
 
 function WorkGallery() {
@@ -175,7 +176,7 @@ function WorkGallery() {
           </div>
         </div>
 
-        {/* 2. Horizontal Videos Section (project4 - project6) */}
+        {/* 2. Horizontal Videos Section (project4 - project7) */}
         <div>
           <div className="flex items-center gap-4 mb-10 border-b border-zinc-800 pb-4">
             <span className="text-yellow-500 font-mono text-sm tracking-widest font-bold">02 /</span>
