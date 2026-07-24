@@ -31,14 +31,14 @@ const LANGUAGES: TechItem[] = [
     </header>
   </body>
 </html>`,
-    description: 'Structure-first web architecture utilizing clean semantic HTML5 elements for optimal SEO, accessibility, and high search engine ranking.',
+    description: 'Structure-first web architecture utilizing clean semantic HTML5 elements for optimal SEO, accessibility, and search visibility.',
   },
   {
     id: 'css',
     title: 'Modern CSS3 & Animations',
     filename: 'styles.css',
     language: 'CSS3',
-    codeSnippet: `/* Glassmorphism & Responsive Container Styles */
+    codeSnippet: `/* Glassmorphism & Responsive Styles */
 .terminal-window {
   display: flex;
   flex-direction: column;
@@ -55,7 +55,7 @@ const LANGUAGES: TechItem[] = [
   border-color: rgba(234, 179, 8, 0.4);
   transform: translateY(-4px);
 }`,
-    description: 'Custom CSS Grid and Flexbox layouts, fluid typography, responsive media queries, keyframe animations, and modern glassmorphism aesthetics.',
+    description: 'Custom CSS Grid and Flexbox layouts, fluid typography, media queries, keyframe animations, and modern glassmorphism aesthetics.',
   },
   {
     id: 'js',
@@ -77,7 +77,7 @@ async function fetchPortfolioProjects(endpoint) {
     console.error("Failed to load projects:", error);
   }
 }`,
-    description: 'Core web interactivity using modern ES6+ features, asynchronous async/await pipelines, DOM manipulation, and dynamic event handling.',
+    description: 'Core web logic using modern ES6+ syntax, asynchronous async/await execution pipelines, DOM manipulation, and dynamic event listeners.',
   },
   {
     id: 'ts',
@@ -97,7 +97,7 @@ export interface DeveloperProfile {
 export function validateProfile<T extends DeveloperProfile>(profile: T): boolean {
   return profile.skills !== undefined && profile.isAvailableForHire;
 }`,
-    description: 'Enterprise-grade TypeScript engineering ensuring static type safety, reduced runtime bugs, robust interfaces, and clean documentation.',
+    description: 'Enterprise-grade TypeScript static type safety, compile-time error detection, robust interface declarations, and clean codebases.',
   },
   {
     id: 'tsx',
@@ -123,7 +123,7 @@ export default function InteractiveTerminal({ title, codeSnippet }: { title: str
     </div>
   );
 }`,
-    description: 'Modern component-driven architecture using React 19 and Next.js, featuring server-side rendering (SSR), dynamic routing, and WebGL hooks.',
+    description: 'Modern component-driven architecture leveraging React 19 and Next.js for server-side rendering (SSR), dynamic routing, and WebGL hooks.',
   },
   {
     id: 'sql',
@@ -142,7 +142,7 @@ WHERE projects.status = 'published'
 GROUP BY users.id, users.username
 HAVING COUNT(projects.id) > 5
 ORDER BY aggregate_views DESC;`,
-    description: 'Relational database schema design, indexing, complex table JOIN operations, aggregations, and high-performance database querying.',
+    description: 'Relational database schema modeling, indexing, multi-table JOIN queries, data grouping, and high-performance querying.',
   },
   {
     id: 'c',
@@ -174,7 +174,7 @@ int main() {
     free(head);
     return 0;
 }`,
-    description: 'Low-level procedural programming focusing on manual memory management, pointers, dynamic memory allocation, and data structures.',
+    description: 'Low-level systems programming emphasizing manual memory management, raw pointers, memory allocation, and foundational data structures.',
   },
   {
     id: 'cpp',
@@ -202,12 +202,12 @@ public:
 };
 
 int main() {
-    std::vector<std.unique_ptr<RenderObject>> scene;
+    std::vector<std::unique_ptr<RenderObject>> scene;
     scene.push_back(std::make_unique<Mesh>("KeyboardKeycap"));
     for (const auto& obj : scene) obj->render();
     return 0;
 }`,
-    description: 'High-performance Object-Oriented Programming (OOP) utilizing smart pointers, templates, custom memory management, and Standard Template Library (STL).',
+    description: 'High-performance Object-Oriented Programming (OOP), smart pointers, template meta-programming, and C++ Standard Template Library (STL).',
   },
   {
     id: 'java',
@@ -231,7 +231,7 @@ public class DataProcessor {
                 .collect(Collectors.toList());
     }
 }`,
-    description: 'Robust Object-Oriented software engineering with strong typing, multi-threading, Stream API pipelines, and cross-platform reliability.',
+    description: 'Robust object-oriented application development utilizing strong typing, multi-threading, Stream APIs, and enterprise design patterns.',
   },
   {
     id: 'python',
@@ -256,7 +256,7 @@ def process_video_metadata(directory_path: str):
                 data = json.load(f)
                 projects.append(VideoProject(**data))
     return [p.name for p in projects if p.fps >= 60]`,
-    description: 'Versatile scripting for rapid prototyping, data parsing, backend API automation, mathematical processing, and workflow utility tool building.',
+    description: 'Versatile scripting for rapid data processing, API automation, backend integration, file I/O operations, and tool development.',
   },
 ];
 
@@ -265,7 +265,6 @@ function SingleTerminalBox({ item }: { item: TechItem }) {
   const [displayedCode, setDisplayedCode] = useState('');
   const [isTyping, setIsTyping] = useState(true);
 
-  // Typewriter write-on animation when code is visible
   useEffect(() => {
     if (showCode) {
       setDisplayedCode('');
@@ -286,7 +285,6 @@ function SingleTerminalBox({ item }: { item: TechItem }) {
     }
   }, [showCode, item.codeSnippet]);
 
-  // Smooth auto-toggle every 10 seconds
   useEffect(() => {
     const cycleInterval = setInterval(() => {
       setShowCode((prev) => !prev);
@@ -353,7 +351,7 @@ function SingleTerminalBox({ item }: { item: TechItem }) {
         </button>
       </div>
 
-      {/* Main Terminal Window */}
+      {/* Main Content Area */}
       <div style={{ flex: 1, padding: '2.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         {showCode ? (
           <div
