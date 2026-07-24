@@ -114,51 +114,102 @@ function Intro() {
   );
 }
 
-/* --- Selected Works (Video Grid) --- */
-const videoProjects = [
-  { id: 1, title: 'Cinematic Reel 01', cat: 'Narrative Short', year: '2026', src: '/reel1.mp4' },
-  { id: 2, title: 'Action Edit 02', cat: 'Speed Ramping', year: '2025', src: '/reel2.mp4' },
-  { id: 3, title: 'Gaming Montage', cat: 'Sound Design & VFX', year: '2025', src: '/reel3.mp4' },
-  { id: 4, title: 'Commercial Promo', cat: 'Color Grade & Pace', year: '2026', src: '/reel4.mp4' },
+/* --- Selected Works (Vertical & Horizontal Video Grid) --- */
+const verticalProjects = [
+  { id: 1, title: 'Vertical Edit 01', cat: 'Short Form Reel', year: '2026', src: '/project1.mp4' },
+  { id: 2, title: 'Vertical Edit 02', cat: 'Speed Ramping', year: '2026', src: '/project2.mp4' },
+  { id: 3, title: 'Vertical Edit 03', cat: 'High Retention Cut', year: '2025', src: '/project3.mp4' },
+];
+
+const horizontalProjects = [
+  { id: 4, title: 'Horizontal Edit 04', cat: 'Cinematic Narrative', year: '2026', src: '/project4.mp4' },
+  { id: 5, title: 'Horizontal Edit 05', cat: 'Commercial Promo', year: '2025', src: '/project5.mp4' },
+  { id: 6, title: 'Horizontal Edit 06', cat: 'Film Production Cut', year: '2025', src: '/project6.mp4' },
 ];
 
 function WorkGallery() {
   return (
     <section className="bg-[#050505] text-white py-24 px-6">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-20 text-center">
+        
+        {/* Title Header */}
+        <div className="mb-24 text-center">
           <h2 className="text-[10vw] font-black leading-none uppercase">SELECTED</h2>
           <h2 className="text-[10vw] font-black leading-none uppercase text-transparent" style={{ WebkitTextStroke: '1px #EAB308' }}>
             WORKS
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16">
-          {videoProjects.map((project) => (
-            <div key={project.id} className="group cursor-pointer">
-              <div className="relative overflow-hidden aspect-video bg-zinc-900 mb-4 rounded-lg border border-zinc-800">
-                <video
-                  src={project.src}
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                />
-              </div>
-              <div className="flex justify-between items-end border-b border-zinc-800 pb-3">
-                <div>
-                  <h3 className="text-2xl font-bold text-yellow-500 flex items-center gap-2">
-                    {project.title}
-                    <ArrowUpRight className="w-5 h-5 text-gray-500 group-hover:text-yellow-500 transition-colors" />
-                  </h3>
-                  <span className="text-xs font-mono text-gray-400">{project.cat}</span>
+        {/* 1. Vertical Videos Section (project1 - project3) */}
+        <div className="mb-28">
+          <div className="flex items-center gap-4 mb-10 border-b border-zinc-800 pb-4">
+            <span className="text-yellow-500 font-mono text-sm tracking-widest font-bold">01 /</span>
+            <h3 className="text-xl md:text-2xl font-bold uppercase tracking-wider">Vertical Reels (9:16)</h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
+            {verticalProjects.map((project) => (
+              <div key={project.id} className="group cursor-pointer">
+                <div className="relative overflow-hidden aspect-[9/16] bg-zinc-900 mb-4 rounded-xl border border-zinc-800 shadow-2xl">
+                  <video
+                    src={project.src}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  />
                 </div>
-                <span className="text-xs font-mono text-gray-500">{project.year}</span>
+                <div className="flex justify-between items-end border-b border-zinc-800 pb-3">
+                  <div>
+                    <h4 className="text-lg font-bold text-yellow-500 flex items-center gap-1">
+                      {project.title}
+                      <ArrowUpRight className="w-4 h-4 text-gray-500 group-hover:text-yellow-500 transition-colors" />
+                    </h4>
+                    <span className="text-xs font-mono text-gray-400">{project.cat}</span>
+                  </div>
+                  <span className="text-xs font-mono text-gray-500">{project.year}</span>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
+
+        {/* 2. Horizontal Videos Section (project4 - project6) */}
+        <div>
+          <div className="flex items-center gap-4 mb-10 border-b border-zinc-800 pb-4">
+            <span className="text-yellow-500 font-mono text-sm tracking-widest font-bold">02 /</span>
+            <h3 className="text-xl md:text-2xl font-bold uppercase tracking-wider">Cinematic Widescreen (16:9)</h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16">
+            {horizontalProjects.map((project) => (
+              <div key={project.id} className="group cursor-pointer">
+                <div className="relative overflow-hidden aspect-video bg-zinc-900 mb-4 rounded-xl border border-zinc-800 shadow-2xl">
+                  <video
+                    src={project.src}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  />
+                </div>
+                <div className="flex justify-between items-end border-b border-zinc-800 pb-3">
+                  <div>
+                    <h4 className="text-xl font-bold text-yellow-500 flex items-center gap-2">
+                      {project.title}
+                      <ArrowUpRight className="w-5 h-5 text-gray-500 group-hover:text-yellow-500 transition-colors" />
+                    </h4>
+                    <span className="text-xs font-mono text-gray-400">{project.cat}</span>
+                  </div>
+                  <span className="text-xs font-mono text-gray-500">{project.year}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
       </div>
     </section>
   );
