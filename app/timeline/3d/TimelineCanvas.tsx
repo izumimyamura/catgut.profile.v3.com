@@ -1,0 +1,128 @@
+'use client';
+
+import React, { useMemo, useState } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { ScrollControls, useScroll, Line, Box, Edges, Text } from '@react-three/drei';
+import * as THREE from 'three';
+import { WORK_TIMELINE, WorkTimelinePoint } from '../constants';
+
+const reusableLeft = new THREE.Vector3(-0.3, 0, -0.1);
+const reusableRight = new THREE.Vector3(0.3, 0, -0.1);
+
+function TimelinePointItem({ point, diff }: { point: WorkTimelinePoint; diff: number }) {
+  const offsetPos = point.position === 'left' ? reusableLeft : reusableRight;
+  const textAlign = point.position === 'left' ? 'right' : 'left';
+
+  return (
+    <group position={point.point} scale={0.6}>
+      <Box args={[0.25, 0.25, 0.25]} position={[0, 0, -0.1]} scale={[1 - diff, 1 - diff, 1 - diff]}>
+        <meshBasicMaterial color="#EAB308" wireframe />
+        <Edges color="#EAB308" lineWidth={2} />
+      </Box>
+
+      <group position={offsetPos}>
+        <Text color="#ffffff" fontSize={0.35} anchorX={textAlign} position={[0, 0.4, 0]}>
+          {point.year}
+        </Text>
+        <Text color="#EAB308" fontSize={0.55} maxWidth={3.5} anchorX={textAlign} position={[0, 0, 0]}>
+          {point.title}
+        </Text>
+        <Text color="#a1a1aa" fontSize={0.22} maxWidth={3.5} anchorX={textAlign} position={[0, -0.45, 0]}>
+          {point.subtitle}
+        </Text>
+      </group>
+    </group>
+  );
+}
+
+function Track3D() {
+  const data = useScroll();
+  const timeline = useMemo(() => WORK_TIMELINE, []);
+
+  const curve = useMemo(
+    () => new THREE.CatmullRomCurve3(timeline.map((p) => new THREE.Vector3(...p.point)), false),
+    [timeline]
+  );
+  const curvePoints = useMemo(() => curve.getPoints(500), [curve]);
+
+  const [progress, setProgress] = useState(0);
+
+  useFrame(({ camera }, delta) => {
+    if (data) {
+      const p = Math.min(Math.max(data.range(0, 1), 0), 1);
+      setProgress(p);
+
+      const targetPos = curve.getPoint(p);
+      camera.position.x = THREE.MathUtils.damp(camera.position.x, targetPos.x, 4, delta);
+      camera.position.y = THREE.MathUtils.damp(camera.position.y, targetPos.y + 1, 4, delta);
+      camera.position.z = THREE.MathUtils.damp(camera.position.z, targetPos.z + 5, 4, delta);
+      camera.lookAt(targetPos.x, targetPos.y, targetPos.z - 2);
+    }
+  });
+
+  const visibleCurvePoints = useMemo(
+    () => curvePoints.slice(0, Math.max(1, Math.ceil(progress * curvePoints.length))),
+    [curvePoints, progress]
+  );
+
+  return (
+    <group position={[0, 0, 0]}>
+      <Line points={visibleCurvePoints} color="#EAB308" lineWidth={3.5} />
+      {timeline.map((point, i) => {
+        const diff = Math.min(2 * Math.max(i - progress * (timeline.length - 1), 0), 1);
+        return <TimelinePointItem key={i} point={point} diff={diff} />;
+      })}
+    </group>
+  );
+}
+
+export default function TimelineCanvas() {
+  return (
+    <div style={{ width: '100vw', height: '100vh', backgroundColor: '#050505', position: 'relative' }}>
+      <Canvas camera={{ position: [0, 1, 6], fov: 60 }}>
+        <ambientLight intensity={0.8} />
+        <pointLight position={[10, 10, 10]} intensity={1.5} />
+        <ScrollControls pages={5} damping={0.3}>
+          <Track3D />
+        </ScrollControls>
+      </Canvas>
+
+      {/* Header Overlay */}
+      <div style={{ position: 'absolute', top: '2rem', left: '2.5rem', zIndex: 20, pointerEvents: 'none' }}>
+        <span style={{ color: '#EAB308', fontSize: '0.8rem', fontWeight: 800, letterSpacing: '0.2em', textTransform: 'uppercase' }}>
+          Career Evolution
+        </span>
+        <h1 style={{ fontSize: '2.5rem', fontWeight: 900, color: '#fff', margin: '0.2rem 0 0 0' }}>
+          My Timeline
+        </h1>
+      </div>
+
+      {/* Back Button */}
+      <a
+        href="/"
+        style={{
+          position: 'absolute',
+          top: '2rem',
+          right: '2.5rem',
+          zIndex: 20,
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          color: '#fff',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          padding: '0.6rem 1.4rem',
+          borderRadius: '999px',
+          fontWeight: 700,
+          fontSize: '0.85rem',
+          textDecoration: 'none',
+          backdropFilter: 'blur(10px)',
+        }}
+      >
+        ← Back Home
+      </a>
+
+      {/* Scroll Indicator */}
+      <div style={{ position: 'absolute', bottom: '2rem', left: '50%', transform: 'translateX(-50%)', color: '#71717a', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '0.2em' }}>
+        SCROLL TO TRAVERSE TIMELINE
+      </div>
+    </div>
+  );
+}
