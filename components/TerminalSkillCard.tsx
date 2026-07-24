@@ -105,15 +105,10 @@ export function validateProfile<T extends DeveloperProfile>(profile: T): boolean
     language: 'React / Next.js',
     codeSnippet: `'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 export default function InteractiveTerminal({ title, codeSnippet }: { title: string; codeSnippet: string }) {
   const [active, setActive] = useState<boolean>(true);
-
-  useEffect(() => {
-    const timer = setInterval(() => setActive(prev => !prev), 20000);
-    return () => clearInterval(timer);
-  }, []);
 
   return (
     <div className="terminal-container">
@@ -263,32 +258,30 @@ def process_video_metadata(directory_path: str):
 function highlightCode(code: string) {
   if (!code) return null;
 
-  // Token patterns
   const tokenRegex = /(?:\/\/[^\n]*|\/\*[\s\S]*?\*\/|--[^\n]*|#[^\n]*)|(?:"(?:\\.|[^\\"])*"|'(?:\\.|[^\\'])*'|`(?:\\.|[^\\`])*`)|(?:\b(?:import|export|from|default|function|return|const|let|var|interface|type|class|public|private|virtual|struct|typedef|include|SELECT|FROM|WHERE|GROUP|BY|HAVING|ORDER|COUNT|SUM|INNER|JOIN|AS|ON|void|int|boolean|bool|try|catch|throw|new|await|async|if|else|while|for|def|typedef|override|final)\b)|(?:\b(?:string|number|boolean|List|Node|std|vector|unique_ptr|html|head|body|header|h1|p|div|span|meta|title|DOCTYPE|doctype)\b)|(?:\b\d+\b)|([a-zA-Z_$][a-zA-Z0-9_$]*(?=\s*\())/g;
 
   const elements: React.ReactNode[] = [];
   let lastIndex = 0;
 
   code.replace(tokenRegex, (match, fnName, offset) => {
-    // Push plain text before token
     if (offset > lastIndex) {
       elements.push(<span key={`text-${lastIndex}`}>{code.substring(lastIndex, offset)}</span>);
     }
 
-    let color = '#d4d4d8'; // Default foreground (VS Code light grey)
+    let color = '#d4d4d8';
 
     if (match.startsWith('//') || match.startsWith('/*') || match.startsWith('--') || (match.startsWith('#') && !match.startsWith('#include'))) {
-      color = '#6A9955'; // Comments (Green)
+      color = '#6A9955';
     } else if (match.startsWith('"') || match.startsWith("'") || match.startsWith('`')) {
-      color = '#CE9178'; // Strings (Coral / Orange)
+      color = '#CE9178';
     } else if (/^(import|export|from|default|function|return|const|let|var|interface|type|class|public|private|virtual|struct|typedef|include|SELECT|FROM|WHERE|GROUP|BY|HAVING|ORDER|COUNT|SUM|INNER|JOIN|AS|ON|void|int|boolean|bool|try|catch|throw|new|await|async|if|else|while|for|def|override|final)$/.test(match)) {
-      color = '#569CD6'; // Keywords (VS Code Blue)
+      color = '#569CD6';
     } else if (/^(string|number|boolean|List|Node|std|vector|unique_ptr|html|head|body|header|h1|p|div|span|meta|title|DOCTYPE|doctype)$/.test(match)) {
-      color = '#4EC9B0'; // Types & HTML Elements (VS Code Teal)
+      color = '#4EC9B0';
     } else if (/^\d+$/.test(match)) {
-      color = '#B5CEA8'; // Numbers (VS Code Soft Green)
+      color = '#B5CEA8';
     } else if (fnName) {
-      color = '#DCDCAA'; // Function names (VS Code Yellow)
+      color = '#DCDCAA';
     }
 
     elements.push(
@@ -332,14 +325,6 @@ function SingleTerminalBox({ item }: { item: TechItem }) {
       return () => clearInterval(typingInterval);
     }
   }, [showCode, item.codeSnippet]);
-
-  useEffect(() => {
-    const cycleInterval = setInterval(() => {
-      setShowCode((prev) => !prev);
-    }, 20000);
-
-    return () => clearInterval(cycleInterval);
-  }, []);
 
   return (
     <div
@@ -400,7 +385,7 @@ function SingleTerminalBox({ item }: { item: TechItem }) {
         </button>
       </div>
 
-      {/* Main Terminal Window with Strict Size Bounds & Auto Scroll */}
+      {/* Main Terminal Window */}
       <div
         style={{
           flex: 1,
@@ -418,7 +403,7 @@ function SingleTerminalBox({ item }: { item: TechItem }) {
               width: '100%',
               margin: 0,
               fontFamily: 'Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
-              fontSize: '0.78rem', // Tiny VS Code editor font size to prevent layout breaking
+              fontSize: '0.78rem',
               lineHeight: 1.5,
               whiteSpace: 'pre',
               wordBreak: 'normal',
@@ -461,7 +446,7 @@ function SingleTerminalBox({ item }: { item: TechItem }) {
         }}
       >
         <span>FILE: {item.filename}</span>
-        <span style={{ color: '#EAB308', fontWeight: 600 }}>AUTO-SWITCHING (20s)</span>
+        <span style={{ color: '#EAB308', fontWeight: 600 }}>MANUAL TOGGLE</span>
       </div>
     </div>
   );

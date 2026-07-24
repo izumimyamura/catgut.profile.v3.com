@@ -32,7 +32,7 @@ export default function Home() {
   return (
     <main style={{ minHeight: '100vh', backgroundColor: '#000', color: '#fff', fontFamily: '-apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", sans-serif', position: 'relative', overflowX: 'hidden' }}>
       
-      {/* 1. Multi-language Preloader (Only this triggers setLoading(false) once all 10 languages finish) */}
+      {/* 1. Multi-language Preloader */}
       {loading && <Preloader onComplete={() => setLoading(false)} />}
 
       {/* 2. Fixed 3D Keyboard Background Layer */}
@@ -122,14 +122,35 @@ export default function Home() {
       {/* Navigation Header */}
       <nav style={{ position: 'fixed', top: 0, left: 0, width: '100%', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.2rem 2.5rem', backgroundColor: 'rgba(0, 0, 0, 0.4)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
         <div style={{ fontSize: '1.2rem', fontWeight: 800, letterSpacing: '0.15em' }}>THE CAT GUY</div>
-        <div style={{ display: 'flex', gap: '2.5rem', fontSize: '0.9rem', fontWeight: 500 }}>
+        
+        <div style={{ display: 'flex', gap: '2rem', alignItems: 'center', fontSize: '0.9rem', fontWeight: 500 }}>
           <a href="#hero" style={{ color: '#e5e5e5', textDecoration: 'none' }}>Home</a>
           <a href="#projects" style={{ color: '#e5e5e5', textDecoration: 'none' }}>Projects</a>
           <a href="#photos" style={{ color: '#e5e5e5', textDecoration: 'none' }}>Photography</a>
           <a href="#stack" style={{ color: '#e5e5e5', textDecoration: 'none' }}>My Stack</a>
           <a href="#webdev" style={{ color: '#EAB308', textDecoration: 'none' }}>Web Dev</a>
           <a href="#motion-skills" style={{ color: '#e5e5e5', textDecoration: 'none' }}>Motion Suite</a>
+          
+          {/* Portfolio Link Button */}
+          <a
+            href="https://kavin-portfolio-v2-7x939lrzi-catguy.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              backgroundColor: 'rgba(234, 179, 8, 0.15)',
+              color: '#EAB308',
+              border: '1px solid rgba(234, 179, 8, 0.4)',
+              padding: '0.4rem 1.1rem',
+              borderRadius: '9999px',
+              fontWeight: 700,
+              textDecoration: 'none',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            Portfolio ↗
+          </a>
         </div>
+
         <a href="mailto:kavin123kavinl123@gmail.com" style={{ backgroundColor: '#fff', color: '#000', padding: '0.6rem 1.5rem', borderRadius: '9999px', fontSize: '0.9rem', fontWeight: 700, textDecoration: 'none' }}>Hire Me</a>
       </nav>
 
@@ -178,7 +199,7 @@ export default function Home() {
             <div className="apple-slider-right">
               <h3 style={{ fontSize: '2.2rem', fontWeight: 800, margin: '0 0 1rem 0' }}>Cinematic Atmosphere</h3>
               <p style={{ color: '#a1a1aa', fontSize: '1.1rem', lineHeight: 1.6, marginBottom: '2rem' }}>Transforming raw footage into a moody, cinematic experience. Advanced color grading nodes mixed with environmental soundscapes.</p>
-              <a href="https://www.instagram.com/thecatguy.editz/" target="_blank" rel="noreferrer" style={{ display: 'inline-block', backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.2)', padding: '0.8rem 2rem', borderRadius: '999px', fontWeight: 600, textDecoration: 'none', alignSelf: 'flex-start' }}>Watch on Instagram ↗</a>
+              <a href="https://www.instagram.com/thecatguy.editz/" target="_blank" rel="noreferrer" style={{ display: 'inline-block', backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.2)', padding: '0.8rem 2rem', borderRadius: '999px', fontWeight :600, textDecoration: 'none', alignSelf: 'flex-start' }}>Watch on Instagram ↗</a>
             </div>
           </div>
 
@@ -247,22 +268,22 @@ export default function Home() {
         <p style={{ color: '#a1a1aa', fontSize: '1.3rem', marginTop: '1rem', textAlign: 'center' }}>Click keycaps directly on the 3D keyboard to view details.</p>
       </section>
 
-      {/* WEB DEVELOPMENT SKILLS SECTION (Stacked Terminal Windows with syntax highlighting) */}
+      {/* WEB DEVELOPMENT SKILLS SECTION */}
       <section id="webdev" style={{ width: '100vw', backgroundColor: 'rgba(0,0,0,0.85)', position: 'relative', zIndex: 10, padding: '15vh 2rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
         <div style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto 4rem auto' }}>
-          <span style={{ color: '#EAB308', fontSize: '0.9rem', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase' }}>Full Stack Capabilities</span>
+          <span style={{ color: '#EAB308', fontSize: '0.9rem', fontWeight :700, letterSpacing: '0.2em', textTransform: 'uppercase' }}>Full Stack Capabilities</span>
           <h2 style={{ fontSize: 'clamp(2.5rem, 5vw, 4.5rem)', fontWeight: 900, margin: '0.8rem 0 0 0' }}>Web Development Skills</h2>
-          <p style={{ color: '#a1a1aa', fontSize: '1.2rem', marginTop: '1rem', lineHeight: 1.6 }}>Interactive VS Code terminal workspaces displaying language syntax switching to descriptions every 20 seconds.</p>
+          <p style={{ color: '#a1a1aa', fontSize: '1.2rem', marginTop: '1rem', lineHeight: 1.6 }}>Interactive VS Code terminal workspaces displaying code snippets with manual detail toggle.</p>
         </div>
 
         {/* Stacked Terminal Windows for All Languages */}
         <TerminalSkillCard />
       </section>
 
-      {/* SIDEWAYS SCROLLING WORDS: "we wanna be where the people are" */}
+      {/* SIDEWAYS SCROLLING WORDS */}
       <HorizontalWords />
 
-      {/* TRUUS-STYLE POOKIE/GOOFY MOTION & EDITING SECTION */}
+      {/* TRUUS-STYLE MOTION & EDITING SECTION */}
       <TruusMotionSection />
 
       {/* TRUUS-STYLE BLUE FOOTER WITH GIANT WORDMARK & CREDITS POPUP */}
