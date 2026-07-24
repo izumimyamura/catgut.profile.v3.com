@@ -254,7 +254,7 @@ def process_video_metadata(directory_path: str):
   },
 ];
 
-// Lightweight VS Code / Xcode Syntax Highlighter Tokenizer
+// VS Code / Xcode Syntax Highlighter Tokenizer
 function highlightCode(code: string) {
   if (!code) return null;
 
@@ -302,9 +302,10 @@ function highlightCode(code: string) {
 }
 
 function SingleTerminalBox({ item }: { item: TechItem }) {
-  const [showCode, setShowCode] = useState(true);
+  // Default to showing explanation/details (false) instead of code
+  const [showCode, setShowCode] = useState(false);
   const [displayedCode, setDisplayedCode] = useState('');
-  const [isTyping, setIsTyping] = useState(true);
+  const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
     if (showCode) {
@@ -385,13 +386,13 @@ function SingleTerminalBox({ item }: { item: TechItem }) {
         </button>
       </div>
 
-      {/* Main Terminal Window */}
+      {/* Main Terminal Window Body */}
       <div
         style={{
           flex: 1,
           padding: '1.5rem',
           display: 'flex',
-          alignItems: 'flex-start',
+          alignItems: 'center',
           justifyContent: 'flex-start',
           overflowX: 'auto',
           overflowY: 'auto',
@@ -446,7 +447,7 @@ function SingleTerminalBox({ item }: { item: TechItem }) {
         }}
       >
         <span>FILE: {item.filename}</span>
-        <span style={{ color: '#EAB308', fontWeight: 600 }}>MANUAL TOGGLE</span>
+        <span style={{ color: '#EAB308', fontWeight: 600 }}>EXPLANATION VIEW</span>
       </div>
     </div>
   );
