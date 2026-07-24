@@ -32,11 +32,11 @@ export default function Home() {
   return (
     <main style={{ minHeight: '100vh', backgroundColor: '#000', color: '#fff', fontFamily: '-apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", sans-serif', position: 'relative', overflowX: 'hidden' }}>
       
-      {/* 1. Multi-language Preloader */}
+      {/* 1. Multi-language Preloader (Only this triggers setLoading(false) once all 10 languages finish) */}
       {loading && <Preloader onComplete={() => setLoading(false)} />}
 
       {/* 2. Fixed 3D Keyboard Background Layer */}
-      <AnimatedBackground onLoaded={() => setLoading(false)} />
+      <AnimatedBackground />
 
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes fadeIn {
@@ -247,7 +247,7 @@ export default function Home() {
         <p style={{ color: '#a1a1aa', fontSize: '1.3rem', marginTop: '1rem', textAlign: 'center' }}>Click keycaps directly on the 3D keyboard to view details.</p>
       </section>
 
-      {/* WEB DEVELOPMENT SKILLS SECTION (Stacked Terminal Windows) */}
+      {/* WEB DEVELOPMENT SKILLS SECTION (Stacked Terminal Windows with syntax highlighting) */}
       <section id="webdev" style={{ width: '100vw', backgroundColor: 'rgba(0,0,0,0.85)', position: 'relative', zIndex: 10, padding: '15vh 2rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
         <div style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto 4rem auto' }}>
           <span style={{ color: '#EAB308', fontSize: '0.9rem', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase' }}>Full Stack Capabilities</span>

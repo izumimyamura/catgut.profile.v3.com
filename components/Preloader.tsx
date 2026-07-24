@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
 const WELCOME_WORDS = [
   { text: 'வணக்கம்', lang: 'Tamil' },
-  { text: 'நமஸ்காரம்', lang: 'Malayalam' },
+  { text: 'സ്വാഗതം', lang: 'Malayalam' },
   { text: 'ನಮಸ್ಕಾರ', lang: 'Kannada' },
   { text: 'నమస్కారం', lang: 'Telugu' },
   { text: 'नमस्ते', lang: 'Hindi' },
@@ -22,37 +22,44 @@ interface PreloaderProps {
 export default function Preloader({ onComplete }: PreloaderProps) {
   const [index, setIndex] = useState(0);
   const [isExit, setIsExit] = useState(false);
+  const onCompleteRef = useRef(onComplete);
 
   useEffect(() => {
-    // Prevent scrolling while preloader is active
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
+
+  useEffect(() => {
     document.body.style.overflow = 'hidden';
 
-    // Cycle through languages
     const wordInterval = setInterval(() => {
       setIndex((prevIndex) => {
         if (prevIndex < WELCOME_WORDS.length - 1) {
           return prevIndex + 1;
         } else {
           clearInterval(wordInterval);
-          // Initiate smooth slide-up exit animation after the last word
+
+          // Full sequence complete -> Start slide-up exit
           setTimeout(() => {
             setIsExit(true);
-            // Re-enable scrolling & trigger onComplete
+
             setTimeout(() => {
               document.body.style.overflow = '';
-              if (onComplete) onComplete();
-            }, 800);
+              if (onCompleteRef.current) {
+                onCompleteRef.current();
+              }
+            }, 800); // Matches CSS transition duration
           }, 400);
+
           return prevIndex;
         }
       });
-    }, 180); // Speed per word (180ms)
+    }, 180); // 180ms delay per language
 
     return () => {
       clearInterval(wordInterval);
       document.body.style.overflow = '';
     };
-  }, [onComplete]);
+  }, []);
 
   return (
     <div
@@ -82,7 +89,7 @@ export default function Preloader({ onComplete }: PreloaderProps) {
             backgroundColor: '#EAB308',
             display: 'inline-block',
           }}
-        ></span>
+        />
         <h1
           style={{
             fontSize: 'clamp(2.5rem, 6vw, 5rem)',
@@ -91,7 +98,7 @@ export default function Preloader({ onComplete }: PreloaderProps) {
             letterSpacing: '-0.02em',
             margin: 0,
             color: '#ffffff',
-            minWidth: '220px',
+            minWidth: '240px',
             textAlign: 'left',
           }}
         >
