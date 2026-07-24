@@ -1,94 +1,119 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
-import gsap from 'gsap';
+import React, { useEffect, useState } from 'react';
 
-const GREETINGS = [
-  { word: "வணக்கம்", lang: "Tamil" },
-  { word: "നമസ്കാരം", lang: "Malayalam" },
-  { word: "ನಮಸ್ಕಾರ", lang: "Kannada" },
-  { word: "నమస్కారం", lang: "Telugu" },
-  { word: "नमस्कार", lang: "Marathi" },
-  { word: "नमस्ते", lang: "Hindi" },
-  { word: "こんにちは", lang: "Japanese" },
-  { word: "Hallo", lang: "German" },
-  { word: "Bonjour", lang: "French" },
-  { word: "Hello", lang: "English" },
+const WELCOME_WORDS = [
+  { text: 'வணக்கம்', lang: 'Tamil' },
+  { text: 'நமஸ்காரம்', lang: 'Malayalam' },
+  { text: 'ನಮಸ್ಕಾರ', lang: 'Kannada' },
+  { text: 'నమస్కారం', lang: 'Telugu' },
+  { text: 'नमस्ते', lang: 'Hindi' },
+  { text: 'こんにちは', lang: 'Japanese' },
+  { text: 'Hola', lang: 'Spanish' },
+  { text: 'Hallo', lang: 'German' },
+  { text: 'Bonjour', lang: 'French' },
+  { text: 'Welcome', lang: 'English' },
 ];
 
-export default function Preloader({ onComplete }: { onComplete?: () => void }) {
+interface PreloaderProps {
+  onComplete?: () => void;
+}
+
+export default function Preloader({ onComplete }: PreloaderProps) {
   const [index, setIndex] = useState(0);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const textRef = useRef<HTMLParagraphElement>(null);
+  const [isExit, setIsExit] = useState(false);
 
   useEffect(() => {
-    if (index < GREETINGS.length - 1) {
-      const timer = setTimeout(() => {
-        if (textRef.current) {
-          gsap.fromTo(
-            textRef.current,
-            { y: 30, opacity: 0 },
-            { y: 0, opacity: 1, duration: 0.18, ease: "power2.out" }
-          );
-        }
-        setIndex((prev) => prev + 1);
-      }, 200);
-      return () => clearTimeout(timer);
-    } else {
-      const exitTimer = setTimeout(() => {
-        if (containerRef.current) {
-          gsap.to(containerRef.current, {
-            y: "-100vh",
-            duration: 0.8,
-            ease: "power4.inOut",
-            onComplete: () => {
+    // Prevent scrolling while preloader is active
+    document.body.style.overflow = 'hidden';
+
+    // Cycle through languages
+    const wordInterval = setInterval(() => {
+      setIndex((prevIndex) => {
+        if (prevIndex < WELCOME_WORDS.length - 1) {
+          return prevIndex + 1;
+        } else {
+          clearInterval(wordInterval);
+          // Initiate smooth slide-up exit animation after the last word
+          setTimeout(() => {
+            setIsExit(true);
+            // Re-enable scrolling & trigger onComplete
+            setTimeout(() => {
+              document.body.style.overflow = '';
               if (onComplete) onComplete();
-            },
-          });
+            }, 800);
+          }, 400);
+          return prevIndex;
         }
-      }, 400);
-      return () => clearTimeout(exitTimer);
-    }
-  }, [index, onComplete]);
+      });
+    }, 180); // Speed per word (180ms)
+
+    return () => {
+      clearInterval(wordInterval);
+      document.body.style.overflow = '';
+    };
+  }, [onComplete]);
 
   return (
     <div
-      ref={containerRef}
       style={{
         position: 'fixed',
         inset: 0,
-        zIndex: 9999,
-        backgroundColor: '#000',
+        zIndex: 99999,
+        backgroundColor: '#050505',
+        color: '#ffffff',
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        flexDirection: 'column',
+        transform: isExit ? 'translateY(-100%)' : 'translateY(0%)',
+        opacity: isExit ? 0 : 1,
+        transition: 'transform 0.8s cubic-bezier(0.76, 0, 0.24, 1), opacity 0.8s cubic-bezier(0.76, 0, 0.24, 1)',
+        pointerEvents: isExit ? 'none' : 'auto',
       }}
     >
-      <div
-        style={{
-          position: 'relative',
-          overflow: 'hidden',
-          height: '100px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <p
-          ref={textRef}
+      {/* Centered Welcome Text */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <span
           style={{
-            fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
+            width: '10px',
+            height: '10px',
+            borderRadius: '50%',
+            backgroundColor: '#EAB308',
+            display: 'inline-block',
+          }}
+        ></span>
+        <h1
+          style={{
+            fontSize: 'clamp(2.5rem, 6vw, 5rem)',
             fontWeight: 800,
-            color: '#fff',
-            margin: 0,
+            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
             letterSpacing: '-0.02em',
-            fontFamily: 'sans-serif',
+            margin: 0,
+            color: '#ffffff',
+            minWidth: '220px',
+            textAlign: 'left',
           }}
         >
-          • {GREETINGS[index].word}
-        </p>
+          {WELCOME_WORDS[index].text}
+        </h1>
       </div>
+
+      {/* Language Indicator */}
+      <p
+        style={{
+          position: 'absolute',
+          bottom: '3rem',
+          fontSize: '0.85rem',
+          color: '#71717a',
+          fontFamily: 'monospace',
+          letterSpacing: '0.15em',
+          textTransform: 'uppercase',
+          margin: 0,
+        }}
+      >
+        {WELCOME_WORDS[index].lang}
+      </p>
     </div>
   );
 }
