@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { ScrollControls, useScroll, Line, Box, Edges, Text } from '@react-three/drei';
 import * as THREE from 'three';
@@ -9,13 +9,13 @@ import { WORK_TIMELINE, WorkTimelinePoint } from '../constants';
 const reusableLeft = new THREE.Vector3(-0.3, 0, -0.1);
 const reusableRight = new THREE.Vector3(0.3, 0, -0.1);
 
-function TimelinePointItem({ point, diff }: { point: WorkTimelinePoint; diff: number }) {
+function TimelinePointItem({ point }: { point: WorkTimelinePoint }) {
   const offsetPos = point.position === 'left' ? reusableLeft : reusableRight;
   const textAlign = point.position === 'left' ? 'right' : 'left';
 
   return (
     <group position={point.point} scale={0.6}>
-      <Box args={[0.25, 0.25, 0.25]} position={[0, 0, -0.1]} scale={[1 - diff, 1 - diff, 1 - diff]}>
+      <Box args={[0.25, 0.25, 0.25]} position={[0, 0, -0.1]}>
         <meshBasicMaterial color="#EAB308" wireframe />
         <Edges color="#EAB308" lineWidth={2} />
       </Box>
@@ -36,23 +36,22 @@ function TimelinePointItem({ point, diff }: { point: WorkTimelinePoint; diff: nu
 }
 
 function Track3D() {
-  const data = useScroll();
+  const scrollData = useScroll();
   const timeline = useMemo(() => WORK_TIMELINE, []);
-
+  
   const curve = useMemo(
     () => new THREE.CatmullRomCurve3(timeline.map((p) => new THREE.Vector3(...p.point)), false),
     [timeline]
   );
-  const curvePoints = useMemo(() => curve.getPoints(500), [curve]);
-
-  const [progress, setProgress] = useState(0);
+  
+  const curvePoints = useMemo(() => curve.getPoints(300), [curve]);
 
   useFrame(({ camera }, delta) => {
-    if (data) {
-      const p = Math.min(Math.max(data.range(0, 1), 0), 1);
-      setProgress(p);
-
+    if (scrollData) {
+      const p = Math.min(Math.max(scrollData.range(0, 1), 0), 1);
       const targetPos = curve.getPoint(p);
+
+      // Smooth camera motion along curve
       camera.position.x = THREE.MathUtils.damp(camera.position.x, targetPos.x, 4, delta);
       camera.position.y = THREE.MathUtils.damp(camera.position.y, targetPos.y + 1, 4, delta);
       camera.position.z = THREE.MathUtils.damp(camera.position.z, targetPos.z + 5, 4, delta);
@@ -60,18 +59,12 @@ function Track3D() {
     }
   });
 
-  const visibleCurvePoints = useMemo(
-    () => curvePoints.slice(0, Math.max(1, Math.ceil(progress * curvePoints.length))),
-    [curvePoints, progress]
-  );
-
   return (
     <group position={[0, 0, 0]}>
-      <Line points={visibleCurvePoints} color="#EAB308" lineWidth={3.5} />
-      {timeline.map((point, i) => {
-        const diff = Math.min(2 * Math.max(i - progress * (timeline.length - 1), 0), 1);
-        return <TimelinePointItem key={i} point={point} diff={diff} />;
-      })}
+      <Line points={curvePoints} color="#EAB308" lineWidth={3} />
+      {timeline.map((point, i) => (
+        <TimelinePointItem key={i} point={point} />
+      ))}
     </group>
   );
 }
@@ -119,7 +112,7 @@ export default function TimelineCanvas() {
         ← Back Home
       </a>
 
-      {/* Scroll Indicator */}
+      {/* Scroll Hint */}
       <div style={{ position: 'absolute', bottom: '2rem', left: '50%', transform: 'translateX(-50%)', color: '#71717a', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '0.2em' }}>
         SCROLL TO TRAVERSE TIMELINE
       </div>
