@@ -14,6 +14,7 @@ export default function AnimatedBackground({ onLoaded }: { onLoaded?: () => void
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
   const bongoIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Keycap Hover / Click Info
   const handleMouseHover = (e: SplineEvent) => {
     if (!splineApp) return;
     const skill = SKILLS[e.target.name as SkillNames];
@@ -26,6 +27,19 @@ export default function AnimatedBackground({ onLoaded }: { onLoaded?: () => void
     }
   };
 
+  function onLoad(app: Application) {
+    setSplineApp(app);
+    if (onLoaded) onLoaded();
+
+    // Ensure all 3D mesh components stay visible
+    try {
+      const allObjects = app.getAllObjects();
+      allObjects.forEach((obj) => {
+        obj.visible = true;
+      });
+    } catch (e) {}
+  }
+
   useEffect(() => {
     if (!splineApp) return;
 
@@ -36,11 +50,12 @@ export default function AnimatedBackground({ onLoaded }: { onLoaded?: () => void
 
     if (!kbd) return;
 
-    // Start hidden until reaching #stack
-    kbd.visible = false;
+    // Start position: Hide keyboard above #stack
+    gsap.set(kbd.position, { y: -1200 });
 
+    // Bongo Cat typing loop
     if (bongoCat && frame1 && frame2) {
-      bongoCat.visible = false;
+      bongoCat.visible = true;
       let i = 0;
       if (bongoIntervalRef.current) clearInterval(bongoIntervalRef.current);
       bongoIntervalRef.current = setInterval(() => {
@@ -55,39 +70,54 @@ export default function AnimatedBackground({ onLoaded }: { onLoaded?: () => void
       }, 120);
     }
 
-    // Scroll Trigger: Starts at #stack and continuously rotates through the rest of the page
-    const st = ScrollTrigger.create({
-      trigger: "#stack",
-      start: "top bottom",
-      end: "max",
-      scrub: 1,
-      onEnter: () => {
-        if (kbd) kbd.visible = true;
-        if (bongoCat) bongoCat.visible = true;
-      },
-      onLeaveBack: () => {
-        if (kbd) kbd.visible = false;
-        if (bongoCat) bongoCat.visible = false;
-      },
-      onUpdate: (self) => {
-        kbd.rotation.y = self.progress * Math.PI * 4;
-        kbd.rotation.x = Math.sin(self.progress * Math.PI * 2) * 0.35 + 0.2;
-        kbd.rotation.z = Math.cos(self.progress * Math.PI * 2) * 0.15;
+    // Floating keycaps animation (from video)
+    Object.values(SKILLS).forEach((skill, idx) => {
+      const keycap = splineApp.findObjectByName(skill.name);
+      if (keycap) {
+        gsap.to(keycap.position, {
+          y: Math.random() * 60 + 60,
+          duration: Math.random() * 2 + 1.5,
+          delay: idx * 0.05,
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut",
+        });
+      }
+    });
+
+    // 1. Enter "My Software Stack" (#stack): Slide into center & rotate
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: "#stack",
+        start: "top bottom",
+        end: "bottom center",
+        scrub: 1.2,
       },
     });
+
+    tl.to(kbd.position, { x: 0, y: -40, z: 0, ease: "power2.out" }, 0)
+      .to(kbd.rotation, { x: 0.35, y: Math.PI / 4, z: 0, ease: "power2.out" }, 0);
+
+    // 2. Scroll into "Web Dev" (#webdev): Move to side & tilt
+    const tl2 = gsap.timeline({
+      scrollTrigger: {
+        trigger: "#webdev",
+        start: "top bottom",
+        end: "bottom top",
+        scrub: 1.2,
+      },
+    });
+
+    tl2.to(kbd.position, { x: -300, y: 0, z: 0, ease: "power2.out" }, 0)
+       .to(kbd.rotation, { x: 0.1, y: -Math.PI / 3, z: 0.1, ease: "power2.out" }, 0);
 
     splineApp.addEventListener("mouseHover", handleMouseHover);
 
     return () => {
-      st.kill();
+      ScrollTrigger.getAll().forEach((t) => t.kill());
       if (bongoIntervalRef.current) clearInterval(bongoIntervalRef.current);
     };
   }, [splineApp]);
-
-  function onLoad(app: Application) {
-    setSplineApp(app);
-    if (onLoaded) onLoaded();
-  }
 
   return (
     <div className="fixed inset-0 z-0 pointer-events-none w-screen h-screen overflow-hidden">
@@ -99,6 +129,7 @@ export default function AnimatedBackground({ onLoaded }: { onLoaded?: () => void
         />
       </Suspense>
 
+      {/* Selected Skill Toast */}
       {selectedSkill && (
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 px-6 py-4 bg-black/85 border border-white/10 rounded-2xl text-center backdrop-blur-md max-w-md pointer-events-none shadow-2xl">
           <h4 className="text-yellow-500 font-bold text-lg mb-1">{selectedSkill.label}</h4>

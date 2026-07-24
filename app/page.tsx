@@ -1,7 +1,6 @@
 'use client';
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
-import Link from 'next/link';
 
 const Preloader = dynamic(() => import('../components/Preloader'), { ssr: false });
 const SideRays = dynamic(() => import('../components/SideRays'), { ssr: false });
@@ -25,7 +24,7 @@ export default function Home() {
 
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(6px); }
+          from { opacity: 0; transform: translateY(8px); }
           to { opacity: 1; transform: translateY(0); }
         }
         .standard-video-card { display: flex; flex-direction: row; width: 100%; max-width: 1200px; margin: 0 auto; background-color: #050505; border: 1px solid rgba(255,255,255,0.08); border-radius: 40px; overflow: hidden; margin-bottom: 4rem; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
@@ -35,13 +34,10 @@ export default function Home() {
         .software-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; max-width: 1200px; margin: 3rem auto 0 auto; padding: 0 2rem; }
         .software-card { background: rgba(15, 15, 15, 0.8); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 2rem; text-align: center; backdrop-filter: blur(10px); }
 
-        .terminal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 2.5rem; max-width: 1250px; margin: 3.5rem auto 0 auto; padding: 0 2rem; }
-
         @media (max-width: 900px) {
           .standard-video-card { flex-direction: column; border-radius: 24px; }
           .standard-video-left { flex: 0 0 400px; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.08); }
           .standard-video-right { padding: 2rem; }
-          .terminal-grid { grid-template-columns: 1fr; }
           .split-container { flex-direction: column; text-align: center; }
           .split-text { padding: 4rem 2rem 2rem 2rem !important; align-items: center; }
           .split-cards { padding-bottom: 4rem; width: 100%; }
@@ -194,7 +190,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 5. MY SOFTWARE STACK SECTION (3D Keyboard Starts Here) */}
+      {/* 5. MY SOFTWARE STACK SECTION (3D Keyboard Sequence) */}
       <section id="stack" style={{ width: '100vw', height: '100vh', position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
         <h2 style={{ fontSize: 'clamp(3rem, 6vw, 5.5rem)', fontWeight: 900, textAlign: 'center', margin: 0, textShadow: '0 10px 30px rgba(0,0,0,0.8)' }}>
           My Software Stack
@@ -204,71 +200,16 @@ export default function Home() {
         </p>
       </section>
 
-      {/* 6. WEB DEVELOPMENT SKILLS SECTION (VS Code Terminal Cards) */}
-      <section id="webdev" style={{ width: '100vw', backgroundColor: 'rgba(0,0,0,0.88)', position: 'relative', zIndex: 10, padding: '15vh 0', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-        <div style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto' }}>
+      {/* 6. WEB DEVELOPMENT SKILLS SECTION (Single Large Keyboard-Sized Terminal Box) */}
+      <section id="webdev" style={{ width: '100vw', backgroundColor: 'rgba(0,0,0,0.88)', position: 'relative', zIndex: 10, padding: '15vh 2rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+        <div style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto 3.5rem auto' }}>
           <span style={{ color: '#EAB308', fontSize: '0.9rem', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase' }}>Full Stack Capabilities</span>
           <h2 style={{ fontSize: 'clamp(2.5rem, 5vw, 4.5rem)', fontWeight: 900, margin: '0.8rem 0 0 0' }}>Web Development Skills</h2>
-          <p style={{ color: '#a1a1aa', fontSize: '1.2rem', marginTop: '1rem', lineHeight: 1.6 }}>Interactive terminals displaying live code syntax switching to descriptions every 10s.</p>
+          <p style={{ color: '#a1a1aa', fontSize: '1.2rem', marginTop: '1rem', lineHeight: 1.6 }}>Single dynamic VS Code workspace auto-cycling across languages and frameworks.</p>
         </div>
 
-        <div className="terminal-grid">
-          <TerminalSkillCard
-            title="HTML5 & Modern CSS"
-            filename="layout.styles.css"
-            language="CSS3 & HTML5"
-            codeSnippet={`/* Responsive Fluid Layout */
-.grid-layout {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}`}
-            description="Clean semantic markups, CSS Grid & Flexbox architecture, fluid typography, and custom responsive layouts."
-          />
-
-          <TerminalSkillCard
-            title="JavaScript & TypeScript"
-            filename="state.manager.ts"
-            language="TypeScript"
-            codeSnippet={`interface DeveloperSkills {
-  languages: string[];
-  typeSafe: boolean;
-}
-
-const catGuy: DeveloperSkills = {
-  languages: ["JavaScript", "TypeScript", "Python"],
-  typeSafe: true
-};`}
-            description="Strong ES6+ fundamentals, DOM manipulation, state management, asynchronous data fetching, and type-safe codebases."
-          />
-
-          <TerminalSkillCard
-            title="React & Next.js"
-            filename="App.tsx"
-            language="React / Next.js"
-            codeSnippet={`export default function Portfolio() {
-  return (
-    <React.Suspense fallback={<Preloader />}>
-      <Animated3DCanvas />
-    </React.Suspense>
-  );
-}`}
-            description="Building modern server-rendered applications, dynamic routing, component reusability, and WebGL 3D canvas integrations."
-          />
-
-          <TerminalSkillCard
-            title="Tailwind CSS & Animations"
-            filename="animations.config.js"
-            language="Tailwind & GSAP"
-            codeSnippet={`gsap.to(".keyboard", {
-  scrollTrigger: { scrub: 1 },
-  rotationY: Math.PI * 4,
-  ease: "power2.out"
-});`}
-            description="Utility-first styling mixed with GSAP, Framer Motion, and Smooth Scroll engines for immersive user experiences."
-          />
-        </div>
+        {/* Large Single Terminal Window */}
+        <TerminalSkillCard />
       </section>
 
       {/* 7. FOOTER */}
