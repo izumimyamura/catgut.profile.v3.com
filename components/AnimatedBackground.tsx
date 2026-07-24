@@ -14,7 +14,6 @@ export default function AnimatedBackground({ onLoaded }: { onLoaded?: () => void
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
   const bongoIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Handle Keycap Clicks
   const handleMouseHover = (e: SplineEvent) => {
     if (!splineApp) return;
     const skill = SKILLS[e.target.name as SkillNames];
@@ -27,7 +26,6 @@ export default function AnimatedBackground({ onLoaded }: { onLoaded?: () => void
     }
   };
 
-  // Continuous Full Rotation Setup starting at #photos (Card Stack) with no upper limit
   useEffect(() => {
     if (!splineApp) return;
 
@@ -38,10 +36,11 @@ export default function AnimatedBackground({ onLoaded }: { onLoaded?: () => void
 
     if (!kbd) return;
 
-    kbd.visible = true;
+    // Start hidden until reaching #stack
+    kbd.visible = false;
 
     if (bongoCat && frame1 && frame2) {
-      bongoCat.visible = true;
+      bongoCat.visible = false;
       let i = 0;
       if (bongoIntervalRef.current) clearInterval(bongoIntervalRef.current);
       bongoIntervalRef.current = setInterval(() => {
@@ -56,31 +55,24 @@ export default function AnimatedBackground({ onLoaded }: { onLoaded?: () => void
       }, 120);
     }
 
-    // Keycaps floating animation
-    Object.values(SKILLS).forEach((skill, idx) => {
-      const keycap = splineApp.findObjectByName(skill.name);
-      if (keycap) {
-        gsap.to(keycap.position, {
-          y: Math.random() * 80 + 80,
-          duration: Math.random() * 2 + 1.5,
-          delay: idx * 0.05,
-          repeat: -1,
-          yoyo: true,
-          ease: "sine.inOut",
-        });
-      }
-    });
-
-    // Continuous 360 Scroll Spin starting from Card Stack (#photos)
+    // Scroll Trigger: Starts at #stack and continuously rotates through the rest of the page
     const st = ScrollTrigger.create({
-      trigger: "#photos",
+      trigger: "#stack",
       start: "top bottom",
       end: "max",
       scrub: 1,
+      onEnter: () => {
+        if (kbd) kbd.visible = true;
+        if (bongoCat) bongoCat.visible = true;
+      },
+      onLeaveBack: () => {
+        if (kbd) kbd.visible = false;
+        if (bongoCat) bongoCat.visible = false;
+      },
       onUpdate: (self) => {
         kbd.rotation.y = self.progress * Math.PI * 4;
-        kbd.rotation.x = Math.sin(self.progress * Math.PI * 2) * 0.4 + 0.2;
-        kbd.rotation.z = Math.cos(self.progress * Math.PI * 2) * 0.2;
+        kbd.rotation.x = Math.sin(self.progress * Math.PI * 2) * 0.35 + 0.2;
+        kbd.rotation.z = Math.cos(self.progress * Math.PI * 2) * 0.15;
       },
     });
 
@@ -95,18 +87,6 @@ export default function AnimatedBackground({ onLoaded }: { onLoaded?: () => void
   function onLoad(app: Application) {
     setSplineApp(app);
     if (onLoaded) onLoaded();
-
-    try {
-      const kbd = app.findObjectByName("keyboard");
-      if (kbd) kbd.visible = true;
-
-      const allObjects = app.getAllObjects();
-      allObjects.forEach((obj) => {
-        if (obj.name.includes("keycap") || SKILLS[obj.name]) {
-          obj.visible = true;
-        }
-      });
-    } catch (e) {}
   }
 
   return (
