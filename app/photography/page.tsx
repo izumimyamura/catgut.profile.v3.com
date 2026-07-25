@@ -5,7 +5,7 @@ import { gsap } from 'gsap';
 import { Canvas } from '@react-three/fiber';
 import { useGLTF, OrbitControls, Float, Environment } from '@react-three/drei';
 
-/* --- Interactive Liquid Mouse Trail Effect --- */
+/* --- Real-Time Liquid Fluid Trail (Hover Mask Effect) --- */
 function LiquidCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -19,7 +19,19 @@ function LiquidCanvas() {
     let height = 0;
     let dpr = 1;
 
-    const points: Array<{ x: number; y: number; age: number; maxAge: number; size: number }> = [];
+    // Track active fluid trail points
+    const points: Array<{
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      age: number;
+      maxAge: number;
+      size: number;
+    }> = [];
+
+    let lastX = 0;
+    let lastY = 0;
 
     const resize = () => {
       dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -37,13 +49,27 @@ function LiquidCanvas() {
 
     const handleMouseMove = (e: MouseEvent) => {
       const rect = canvas.getBoundingClientRect();
-      points.push({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-        age: 0,
-        maxAge: 45,
-        size: Math.random() * 60 + 40,
-      });
+      const currentX = e.clientX - rect.left;
+      const currentY = e.clientY - rect.top;
+
+      const vx = currentX - (lastX || currentX);
+      const vy = currentY - (lastY || currentY);
+
+      lastX = currentX;
+      lastY = currentY;
+
+      // Spawn fluid blobs on cursor drag/move
+      for (let i = 0; i < 2; i++) {
+        points.push({
+          x: currentX + (Math.random() - 0.5) * 20,
+          y: currentY + (Math.random() - 0.5) * 20,
+          vx: vx * 0.15 + (Math.random() - 0.5) * 2,
+          vy: vy * 0.15 + (Math.random() - 0.5) * 2,
+          age: 0,
+          maxAge: Math.floor(Math.random() * 30 + 35),
+          size: Math.random() * 70 + 50,
+        });
+      }
     };
 
     window.addEventListener('mousemove', handleMouseMove);
@@ -55,22 +81,27 @@ function LiquidCanvas() {
       for (let i = points.length - 1; i >= 0; i--) {
         const p = points[i];
         p.age++;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vx *= 0.95;
+        p.vy *= 0.95;
+
         if (p.age > p.maxAge) {
           points.splice(i, 1);
           continue;
         }
 
-        const alpha = 1 - p.age / p.maxAge;
-        const currentSize = p.size * (1 - p.age / p.maxAge);
+        const alpha = Math.sin((p.age / p.maxAge) * Math.PI);
+        const currentSize = p.size * (1 - p.age / (p.maxAge * 1.5));
 
         const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, currentSize);
-        gradient.addColorStop(0, `rgba(255, 255, 255, ${alpha * 0.25})`);
-        gradient.addColorStop(0.5, `rgba(220, 220, 220, ${alpha * 0.12})`);
+        gradient.addColorStop(0, `rgba(255, 255, 255, ${alpha * 0.9})`);
+        gradient.addColorStop(0.6, `rgba(240, 240, 240, ${alpha * 0.4})`);
         gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
         ctx.fillStyle = gradient;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, currentSize, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, Math.max(1, currentSize), 0, Math.PI * 2);
         ctx.fill();
       }
 
@@ -89,7 +120,7 @@ function LiquidCanvas() {
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 pointer-events-none z-10 mix-blend-difference opacity-80"
+      className="absolute inset-0 pointer-events-none z-10 mix-blend-difference"
     />
   );
 }
@@ -97,10 +128,10 @@ function LiquidCanvas() {
 /* --- 3D Phone Model Component --- */
 function PhoneModel({ path }: { path: string }) {
   const { scene } = useGLTF(path);
-  return <primitive object={scene} scale={32} position={[0, -1.8, 0]} rotation={[0, Math.PI, 0]} />;
+  return <primitive object={scene} scale={34} position={[0, -1.8, 0]} rotation={[0, Math.PI, 0]} />;
 }
 
-// Preload GLTF model for smoother render
+// Preload GLTF model
 useGLTF.preload('/nothing3a.glb');
 
 export default function PhotographyPage() {
@@ -109,7 +140,7 @@ export default function PhotographyPage() {
   const counter3Ref = useRef<HTMLDivElement>(null);
   const sliderWrapperRef = useRef<HTMLDivElement>(null);
 
-  // 1. GSAP Preloader Animation
+  // 1. Fast GSAP Preloader Animation
   useEffect(() => {
     const counter3 = counter3Ref.current;
     if (counter3) {
@@ -133,12 +164,12 @@ export default function PhotographyPage() {
         onComplete: () => setLoading(false),
       });
 
-      tl.to('.counter-3', { y: -1900, duration: 0.9, ease: 'power2.inOut' })
-        .to('.counter-2', { y: -900, duration: 0.9, ease: 'power2.inOut' }, 0)
-        .to('.counter-1', { y: -100, duration: 0.5, ease: 'power2.inOut' }, 0.4)
-        .to('.digit', { top: '-150px', stagger: 0.05, duration: 0.3, ease: 'power4.inOut' })
-        .fromTo('.loader-stem', { width: '0px' }, { width: '120px', duration: 0.6, ease: 'power2.inOut' }, 0)
-        .fromTo('.loader-loop', { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.4, ease: 'power2.out' }, 0.3)
+      tl.to('.counter-3', { y: -1900, duration: 0.8, ease: 'power2.inOut' })
+        .to('.counter-2', { y: -900, duration: 0.8, ease: 'power2.inOut' }, 0)
+        .to('.counter-1', { y: -100, duration: 0.4, ease: 'power2.inOut' }, 0.3)
+        .to('.digit', { top: '-150px', stagger: 0.04, duration: 0.25, ease: 'power4.inOut' })
+        .fromTo('.loader-stem', { width: '0px' }, { width: '120px', duration: 0.5, ease: 'power2.inOut' }, 0)
+        .fromTo('.loader-loop', { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: 'power2.out' }, 0.25)
         .to('.loader-stem', {
           rotate: 90,
           width: '120px',
@@ -146,7 +177,7 @@ export default function PhotographyPage() {
           x: -25,
           y: 0,
           borderRadius: '4px',
-          duration: 0.3,
+          duration: 0.25,
           ease: 'power3.inOut',
         })
         .to('.loader-loop', {
@@ -159,16 +190,16 @@ export default function PhotographyPage() {
           borderTopRightRadius: '32px',
           borderBottomRightRadius: '32px',
           opacity: 1,
-          duration: 0.3,
+          duration: 0.25,
           ease: 'power3.inOut',
         }, '<')
-        .to('.loading-screen', { opacity: 0, duration: 0.3, ease: 'power1.inOut' }, '+=0.1');
+        .to('.loading-screen', { opacity: 0, duration: 0.25, ease: 'power1.inOut' }, '+=0.1');
     });
 
     return () => ctx.revert();
   }, []);
 
-  // 2. 3D Horizontal Reel Slider Motion
+  // 2. 3D Horizontal Inertia Reel Slider
   useEffect(() => {
     if (loading) return;
 
@@ -240,7 +271,7 @@ export default function PhotographyPage() {
   return (
     <div className="bg-[#0a0a0a] text-[#e5e5e5] min-h-screen font-mono relative overflow-x-hidden select-none">
       
-      {/* 1. FASTER GSAP PRELOADER */}
+      {/* 1. GSAP PRELOADER */}
       {loading && (
         <div className="loading-screen fixed inset-0 z-[100] bg-black text-white flex items-center justify-center pointer-events-none">
           <div className="counter absolute bottom-12 left-12 flex h-[100px] text-[100px] leading-none overflow-hidden font-mono">
@@ -279,31 +310,32 @@ export default function PhotographyPage() {
         <a href="/timeline" className="hover:opacity-60 transition-opacity">Timeline</a>
       </nav>
 
-      {/* 3. HERO WITH LIQUID HOVER EFFECT + EXPANDED 3D PHONE BOX */}
-      <section className="relative pt-28 pb-16 px-6 max-w-[1400px] mx-auto text-center flex flex-col items-center min-h-screen justify-center overflow-hidden">
+      {/* 3. HERO WITH LIQUID MASK EFFECT + FLOATING 3D PHONE */}
+      <section className="relative pt-24 pb-12 px-6 max-w-[1400px] mx-auto text-center flex flex-col items-center min-h-screen justify-center overflow-hidden">
         
-        {/* Real-time Liquid Mouse Hover Effect Canvas */}
+        {/* Interactive Fluid Distortion Canvas (Turns White Text Black on Cursor Touch) */}
         <LiquidCanvas />
 
-        <div className="mb-6 z-20 pointer-events-none">
+        {/* Header Text */}
+        <div className="mb-4 z-20 pointer-events-none">
           <span className="text-xs uppercase text-red-500 tracking-widest font-bold">
             [ NOTHING PHONE (3A) // GLYPH ENGINE 3.0 ]
           </span>
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mt-3 uppercase leading-none">
-            BLACK & WHITE<br />SHOT ON PHONE (3A)
+          <h1 className="text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter mt-2 uppercase leading-none text-white">
+            SHOT ON<br />NOTHING (3A)
           </h1>
           <p className="text-zinc-400 text-xs md:text-sm mt-4 max-w-lg mx-auto font-mono">
             Captured with Dual 50 MP OIS Camera system, custom Monochrome color science, and active Glyph fill light.
           </p>
         </div>
 
-        {/* 3D PHONE BOX CONTAINER */}
-        <div className="w-full max-w-4xl h-[650px] md:h-[720px] relative my-6 border border-zinc-800 rounded-3xl bg-zinc-950/80 shadow-[0_20px_80px_rgba(0,0,0,0.9)] overflow-hidden z-20 transition-all duration-500">
+        {/* FLOATING 3D PHONE MODEL (No Container Box) */}
+        <div className="w-full max-w-5xl h-[600px] md:h-[700px] relative my-2 z-20 pointer-events-auto flex items-center justify-center">
           <Canvas camera={{ position: [0, 0, 5], fov: 42 }}>
-            <ambientLight intensity={glyphMode === 'off' ? 0.6 : glyphMode === 'torch' ? 3.0 : 4.5} />
-            <pointLight position={[0, 1, 2]} intensity={glyphMode === 'off' ? 2 : 14} color="#ffffff" />
+            <ambientLight intensity={glyphMode === 'off' ? 0.6 : glyphMode === 'torch' ? 3.2 : 4.8} />
+            <pointLight position={[0, 1, 2]} intensity={glyphMode === 'off' ? 2 : 15} color="#ffffff" />
             <Suspense fallback={null}>
-              <Float speed={1.5} rotationIntensity={0.3} floatIntensity={0.3}>
+              <Float speed={1.8} rotationIntensity={0.35} floatIntensity={0.4}>
                 <PhoneModel path="/nothing3a.glb" />
               </Float>
               <Environment preset="studio" />
@@ -311,28 +343,40 @@ export default function PhotographyPage() {
             <OrbitControls enableZoom={false} autoRotate autoRotateSpeed={1.2} />
           </Canvas>
 
-          <span className="absolute bottom-6 left-1/2 -translate-x-1/2 text-[10px] text-zinc-500 uppercase tracking-widest bg-black/60 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/10 pointer-events-none">
+          <span className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] text-zinc-500 uppercase tracking-widest bg-black/40 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/10 pointer-events-none">
             3D INTERACTIVE MODEL // DRAG TO ROTATE
           </span>
         </div>
 
-        {/* Glyph Light Mode Buttons */}
-        <div className="flex gap-3 mt-4 z-20">
+        {/* Glyph Controls */}
+        <div className="flex gap-3 mt-2 z-20">
           <button
             onClick={() => setGlyphMode('all')}
-            className={`px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-full border transition-all ${glyphMode === 'all' ? 'bg-white text-black border-white shadow-lg' : 'border-zinc-800 text-zinc-400 hover:border-zinc-500'}`}
+            className={`px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-full border transition-all ${
+              glyphMode === 'all'
+                ? 'bg-white text-black border-white shadow-[0_0_25px_rgba(255,255,255,0.7)]'
+                : 'border-zinc-800 text-zinc-400 hover:border-zinc-500'
+            }`}
           >
             FLASH ALL
           </button>
           <button
             onClick={() => setGlyphMode('torch')}
-            className={`px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-full border transition-all ${glyphMode === 'torch' ? 'bg-white text-black border-white shadow-lg' : 'border-zinc-800 text-zinc-400 hover:border-zinc-500'}`}
+            className={`px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-full border transition-all ${
+              glyphMode === 'torch'
+                ? 'bg-white text-black border-white shadow-[0_0_25px_rgba(255,255,255,0.7)]'
+                : 'border-zinc-800 text-zinc-400 hover:border-zinc-500'
+            }`}
           >
             TORCH MODE
           </button>
           <button
             onClick={() => setGlyphMode('off')}
-            className={`px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-full border transition-all ${glyphMode === 'off' ? 'bg-white text-black border-white shadow-lg' : 'border-zinc-800 text-zinc-400 hover:border-zinc-500'}`}
+            className={`px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-full border transition-all ${
+              glyphMode === 'off'
+                ? 'bg-white text-black border-white shadow-[0_0_25px_rgba(255,255,255,0.7)]'
+                : 'border-zinc-800 text-zinc-400 hover:border-zinc-500'
+            }`}
           >
             SYSTEM OFF
           </button>
@@ -392,7 +436,7 @@ export default function PhotographyPage() {
         </div>
       </section>
 
-      {/* 6. DARK FOOTER WITH INVERTED WATERMARK */}
+      {/* 6. DARK FOOTER WITH VISIBLE LIGHT-GRAY WATERMARK */}
       <footer className="bg-black text-white pt-24 pb-12 px-8 relative overflow-hidden border-t border-zinc-800">
         <div className="max-w-[1400px] mx-auto flex flex-col justify-between min-h-[380px] relative z-10">
           
@@ -428,9 +472,9 @@ export default function PhotographyPage() {
           </div>
         </div>
 
-        {/* Inverted Watermark */}
-        <div className="absolute bottom-0 left-0 w-full overflow-hidden pointer-events-none opacity-[0.05] select-none">
-          <h1 className="text-[20vw] leading-none font-black text-center text-white uppercase tracking-tighter whitespace-nowrap translate-y-[20%]">
+        {/* Light Gray Watermark Text */}
+        <div className="absolute bottom-0 left-0 w-full overflow-hidden pointer-events-none select-none">
+          <h1 className="text-[20vw] leading-none font-black text-center text-zinc-600/30 uppercase tracking-tighter whitespace-nowrap translate-y-[22%]">
             HEISENBERGO
           </h1>
         </div>
