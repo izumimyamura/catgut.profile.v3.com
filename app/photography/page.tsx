@@ -126,12 +126,27 @@ function LiquidCanvas() {
 /* --- 3D Phone Model Component --- */
 function PhoneModel({ path }: { path: string }) {
   const { scene } = useGLTF(path);
-  // Adjusted scale to 18.5 (smaller) and position to -1.85 (shifted lower)
   return <primitive object={scene} scale={18.5} position={[0, -1.85, 0]} rotation={[0, Math.PI, 0]} />;
 }
 
 // Preload GLTF model
 useGLTF.preload('/nothing3a.glb');
+
+// Image assets mapping (img1 to img12)
+const galleryPhotos = [
+  { id: 1, src: '/img1.jpeg', isVertical: true, title: '01 // PORTRAIT SHADOW' },
+  { id: 2, src: '/img2.jpeg', isVertical: false, title: '02 // URBAN SILHOUETTE' },
+  { id: 3, src: '/img3.jpeg', isVertical: false, title: '03 // ARCHITECTURAL DEPTH' },
+  { id: 4, src: '/img4.jpeg', isVertical: false, title: '04 // CONTRAST PERSPECTIVE' },
+  { id: 5, src: '/img5.jpeg', isVertical: false, title: '05 // MONOCHROME LIGHT' },
+  { id: 6, src: '/img6.jpeg', isVertical: false, title: '06 // GEOMETRIC GRAIN' },
+  { id: 7, src: '/img7.jpeg', isVertical: false, title: '07 // RAW TEXTURE' },
+  { id: 8, src: '/img8.jpeg', isVertical: false, title: '08 // INDUSTRIAL REFLECTION' },
+  { id: 9, src: '/img9.jpeg', isVertical: false, title: '09 // NIGHT SHIFT' },
+  { id: 10, src: '/img10.jpeg', isVertical: false, title: '10 // MINIMAL STRUCTURE' },
+  { id: 11, src: '/img11.jpeg', isVertical: true, title: '11 // VERTICAL GRAIN' },
+  { id: 12, src: '/img12.jpeg', isVertical: true, title: '12 // FINAL FRAME' },
+];
 
 export default function PhotographyPage() {
   const [loading, setLoading] = useState(true);
@@ -311,11 +326,8 @@ export default function PhotographyPage() {
 
       {/* 3. HERO SECTION */}
       <section className="relative pt-32 pb-12 px-6 max-w-[1400px] mx-auto text-center flex flex-col items-center min-h-screen justify-center overflow-hidden">
-        
-        {/* Interactive Fluid Distortion Canvas */}
         <LiquidCanvas />
 
-        {/* Heading Text */}
         <div className="mb-4 z-20 pointer-events-none">
           <span className="text-xs uppercase text-red-500 tracking-widest font-bold">
             [ NOTHING PHONE (3A) // GLYPH ENGINE 3.0 ]
@@ -328,7 +340,7 @@ export default function PhotographyPage() {
           </p>
         </div>
 
-        {/* FLOATING 3D PHONE MODEL (Slightly smaller, moved down) */}
+        {/* FLOATING 3D PHONE MODEL */}
         <div className="w-full max-w-3xl h-[420px] md:h-[480px] relative my-2 z-20 pointer-events-auto flex items-center justify-center bg-transparent">
           <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
             <ambientLight intensity={glyphMode === 'off' ? 0.6 : glyphMode === 'torch' ? 3.2 : 4.8} />
@@ -435,7 +447,40 @@ export default function PhotographyPage() {
         </div>
       </section>
 
-      {/* 6. DARK FOOTER WITH VISIBLE LIGHT-GRAY WATERMARK */}
+      {/* 6. NEW: MASONRY / BENTO GALLERY GRID (img1.jpeg to img12.jpeg) */}
+      <section className="py-24 px-6 md:px-12 max-w-[1400px] mx-auto border-t border-zinc-800">
+        <div className="mb-12 flex justify-between items-end">
+          <div>
+            <span className="text-xs text-red-500 font-bold uppercase tracking-widest">[ SHOT ON NOTHING (3A) ]</span>
+            <h2 className="text-4xl md:text-5xl font-black tracking-tight mt-2 uppercase">GALLERY GRID</h2>
+          </div>
+          <span className="text-xs text-zinc-500 font-mono">12 ARCHIVAL CAPTURES</span>
+        </div>
+
+        {/* Dynamic Masonry Grid targeting vertical vs horizontal images */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 auto-rows-[220px] gap-6">
+          {galleryPhotos.map((item) => (
+            <div
+              key={item.id}
+              className={`group relative rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800 transition-all duration-500 hover:border-zinc-500 ${
+                item.isVertical ? 'row-span-2' : 'col-span-1'
+              }`}
+            >
+              <img
+                src={item.src}
+                alt={item.title}
+                className="w-full h-full object-cover grayscale contrast-110 group-hover:scale-105 group-hover:grayscale-0 transition-all duration-700 ease-out"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4 flex flex-col justify-end">
+                <span className="text-xs text-white font-mono">{item.title}</span>
+                <span className="text-[10px] text-zinc-400 uppercase">50 MP OIS • Custom B&W</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 7. DARK FOOTER WITH VISIBLE LIGHT-GRAY WATERMARK */}
       <footer className="bg-black text-white pt-24 pb-12 px-8 relative overflow-hidden border-t border-zinc-800">
         <div className="max-w-[1400px] mx-auto flex flex-col justify-between min-h-[380px] relative z-10">
           
