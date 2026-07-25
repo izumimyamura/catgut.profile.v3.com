@@ -310,46 +310,51 @@ export default function PhotographyPage() {
         <a href="/timeline" className="hover:opacity-60 transition-opacity">Timeline</a>
       </nav>
 
-      {/* 3. HERO WITH LIQUID MASK EFFECT + FLOATING 3D PHONE */}
+      {/* 3. HERO WITH LIQUID MASK EFFECT + OVERLAYING FLOATING 3D PHONE */}
       <section className="relative pt-24 pb-12 px-6 max-w-[1400px] mx-auto text-center flex flex-col items-center min-h-screen justify-center overflow-hidden">
         
-        {/* Interactive Fluid Distortion Canvas (Turns White Text Black on Cursor Touch) */}
+        {/* Interactive Fluid Distortion Canvas */}
         <LiquidCanvas />
 
-        {/* Header Text */}
-        <div className="mb-4 z-20 pointer-events-none">
-          <span className="text-xs uppercase text-red-500 tracking-widest font-bold">
-            [ NOTHING PHONE (3A) // GLYPH ENGINE 3.0 ]
-          </span>
-          <h1 className="text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter mt-2 uppercase leading-none text-white">
-            SHOT ON<br />NOTHING (3A)
-          </h1>
-          <p className="text-zinc-400 text-xs md:text-sm mt-4 max-w-lg mx-auto font-mono">
-            Captured with Dual 50 MP OIS Camera system, custom Monochrome color science, and active Glyph fill light.
-          </p>
-        </div>
+        {/* HERO CONTAINER WITH OVERLAPPING CANVAS & TEXT */}
+        <div className="relative w-full min-h-[750px] flex flex-col items-center justify-center">
+          
+          {/* FLOATING 3D PHONE MODEL (Spans full section height behind text) */}
+          <div className="absolute inset-0 w-full h-full z-10 pointer-events-auto flex items-center justify-center">
+            <Canvas camera={{ position: [0, 0, 5], fov: 42 }}>
+              <ambientLight intensity={glyphMode === 'off' ? 0.6 : glyphMode === 'torch' ? 3.2 : 4.8} />
+              <pointLight position={[0, 1, 2]} intensity={glyphMode === 'off' ? 2 : 15} color="#ffffff" />
+              <Suspense fallback={null}>
+                <Float speed={1.8} rotationIntensity={0.35} floatIntensity={0.4}>
+                  <PhoneModel path="/nothing3a.glb" />
+                </Float>
+                <Environment preset="studio" />
+              </Suspense>
+              <OrbitControls enableZoom={false} autoRotate autoRotateSpeed={1.2} />
+            </Canvas>
 
-        {/* FLOATING 3D PHONE MODEL (No Container Box) */}
-        <div className="w-full max-w-5xl h-[600px] md:h-[700px] relative my-2 z-20 pointer-events-auto flex items-center justify-center">
-          <Canvas camera={{ position: [0, 0, 5], fov: 42 }}>
-            <ambientLight intensity={glyphMode === 'off' ? 0.6 : glyphMode === 'torch' ? 3.2 : 4.8} />
-            <pointLight position={[0, 1, 2]} intensity={glyphMode === 'off' ? 2 : 15} color="#ffffff" />
-            <Suspense fallback={null}>
-              <Float speed={1.8} rotationIntensity={0.35} floatIntensity={0.4}>
-                <PhoneModel path="/nothing3a.glb" />
-              </Float>
-              <Environment preset="studio" />
-            </Suspense>
-            <OrbitControls enableZoom={false} autoRotate autoRotateSpeed={1.2} />
-          </Canvas>
+            <span className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] text-zinc-500 uppercase tracking-widest bg-black/40 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/10 pointer-events-none z-30">
+              3D INTERACTIVE MODEL // DRAG TO ROTATE
+            </span>
+          </div>
 
-          <span className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] text-zinc-500 uppercase tracking-widest bg-black/40 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/10 pointer-events-none">
-            3D INTERACTIVE MODEL // DRAG TO ROTATE
-          </span>
+          {/* Header Text Overlay (Transparent background, clicks pass through to canvas) */}
+          <div className="z-20 pointer-events-none my-auto">
+            <span className="text-xs uppercase text-red-500 tracking-widest font-bold">
+              [ NOTHING PHONE (3A) // GLYPH ENGINE 3.0 ]
+            </span>
+            <h1 className="text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter mt-2 uppercase leading-none text-white">
+              SHOT ON<br />NOTHING (3A)
+            </h1>
+            <p className="text-zinc-400 text-xs md:text-sm mt-4 max-w-lg mx-auto font-mono">
+              Captured with Dual 50 MP OIS Camera system, custom Monochrome color science, and active Glyph fill light.
+            </p>
+          </div>
+
         </div>
 
         {/* Glyph Controls */}
-        <div className="flex gap-3 mt-2 z-20">
+        <div className="flex gap-3 mt-6 z-20">
           <button
             onClick={() => setGlyphMode('all')}
             className={`px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-full border transition-all ${
