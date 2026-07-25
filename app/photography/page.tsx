@@ -126,7 +126,8 @@ function LiquidCanvas() {
 /* --- 3D Phone Model Component --- */
 function PhoneModel({ path }: { path: string }) {
   const { scene } = useGLTF(path);
-  return <primitive object={scene} scale={24} position={[0, -1.1, 0]} rotation={[0, Math.PI, 0]} />;
+  // Adjusted scale to 18.5 (smaller) and position to -1.85 (shifted lower)
+  return <primitive object={scene} scale={18.5} position={[0, -1.85, 0]} rotation={[0, Math.PI, 0]} />;
 }
 
 // Preload GLTF model
@@ -309,13 +310,13 @@ export default function PhotographyPage() {
       </nav>
 
       {/* 3. HERO SECTION */}
-      <section className="relative pt-32 pb-16 px-6 max-w-[1400px] mx-auto text-center flex flex-col items-center min-h-screen justify-center overflow-hidden">
+      <section className="relative pt-32 pb-12 px-6 max-w-[1400px] mx-auto text-center flex flex-col items-center min-h-screen justify-center overflow-hidden">
         
         {/* Interactive Fluid Distortion Canvas */}
         <LiquidCanvas />
 
         {/* Heading Text */}
-        <div className="mb-6 z-20 pointer-events-none">
+        <div className="mb-4 z-20 pointer-events-none">
           <span className="text-xs uppercase text-red-500 tracking-widest font-bold">
             [ NOTHING PHONE (3A) // GLYPH ENGINE 3.0 ]
           </span>
@@ -327,13 +328,13 @@ export default function PhotographyPage() {
           </p>
         </div>
 
-        {/* FLOATING 3D PHONE MODEL (Original Placement, Transparent Container) */}
-        <div className="w-full max-w-4xl h-[500px] md:h-[580px] relative my-4 z-20 pointer-events-auto flex items-center justify-center bg-transparent">
-          <Canvas camera={{ position: [0, 0, 5.2], fov: 48 }}>
+        {/* FLOATING 3D PHONE MODEL (Slightly smaller, moved down) */}
+        <div className="w-full max-w-3xl h-[420px] md:h-[480px] relative my-2 z-20 pointer-events-auto flex items-center justify-center bg-transparent">
+          <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
             <ambientLight intensity={glyphMode === 'off' ? 0.6 : glyphMode === 'torch' ? 3.2 : 4.8} />
             <pointLight position={[0, 1, 2]} intensity={glyphMode === 'off' ? 2 : 15} color="#ffffff" />
             <Suspense fallback={null}>
-              <Float speed={1.5} rotationIntensity={0.3} floatIntensity={0.3}>
+              <Float speed={1.5} rotationIntensity={0.25} floatIntensity={0.25}>
                 <PhoneModel path="/nothing3a.glb" />
               </Float>
               <Environment preset="studio" />
@@ -341,7 +342,7 @@ export default function PhotographyPage() {
             <OrbitControls enableZoom={false} autoRotate autoRotateSpeed={1.2} />
           </Canvas>
 
-          <span className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] text-zinc-500 uppercase tracking-widest bg-black/50 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/10 pointer-events-none">
+          <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-[10px] text-zinc-500 uppercase tracking-widest bg-black/50 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/10 pointer-events-none">
             3D INTERACTIVE MODEL // DRAG TO ROTATE
           </span>
         </div>
