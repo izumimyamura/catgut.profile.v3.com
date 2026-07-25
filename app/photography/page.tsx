@@ -8,7 +8,7 @@ export default function PhotographyPage() {
   const counter3Ref = useRef<HTMLDivElement>(null);
   const sliderWrapperRef = useRef<HTMLDivElement>(null);
 
-  // Preloader Logic
+  // Preloader Logic with "P" Shape Formation
   useEffect(() => {
     const counter3 = counter3Ref.current;
     if (counter3) {
@@ -32,16 +32,43 @@ export default function PhotographyPage() {
         onComplete: () => setLoading(false),
       });
 
-      tl.to('.counter-3', { y: -1900, duration: 2.5, ease: 'power2.inOut' })
-        .to('.counter-2', { y: -900, duration: 2.5, ease: 'power2.inOut' }, 0)
-        .to('.counter-1', { y: -100, duration: 1, ease: 'power2.inOut' }, 1.5)
-        .to('.digit', { top: '-150px', stagger: 0.1, duration: 0.6, ease: 'power4.inOut' })
-        .from('.loader-1', { width: 0, duration: 1.5, ease: 'power2.inOut' }, 0)
-        .from('.loader-2', { width: 0, duration: 1, ease: 'power2.inOut' }, 0.5)
-        // Transition bars to form "P" shape
-        .to('.loader-1', { rotate: 90, y: -30, x: -20, duration: 0.5 })
-        .to('.loader-2', { x: 30, y: -10, borderRadius: '50%', duration: 0.5 }, '<')
-        .to('.loading-screen', { opacity: 0, duration: 0.5, ease: 'power1.inOut' }, '+=0.2');
+      // 1. Counter digits animation
+      tl.to('.counter-3', { y: -1900, duration: 2.2, ease: 'power2.inOut' })
+        .to('.counter-2', { y: -900, duration: 2.2, ease: 'power2.inOut' }, 0)
+        .to('.counter-1', { y: -100, duration: 1, ease: 'power2.inOut' }, 1.2)
+        .to('.digit', { top: '-150px', stagger: 0.1, duration: 0.5, ease: 'power4.inOut' })
+
+        // 2. Loading bar progress fill
+        .fromTo('.loader-stem', { width: '0px' }, { width: '120px', duration: 1.5, ease: 'power2.inOut' }, 0)
+        .fromTo('.loader-loop', { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 1, ease: 'power2.out' }, 0.8)
+
+        // 3. Morph loading bars into clear "P" letter shape
+        .to('.loader-stem', {
+          rotate: 90,
+          width: '120px',
+          height: '18px',
+          x: -25,
+          y: 0,
+          borderRadius: '4px',
+          duration: 0.6,
+          ease: 'power3.inOut',
+        })
+        .to('.loader-loop', {
+          x: 20,
+          y: -28,
+          width: '56px',
+          height: '62px',
+          borderWidth: '16px',
+          borderLeftWidth: '0px',
+          borderTopRightRadius: '32px',
+          borderBottomRightRadius: '32px',
+          opacity: 1,
+          duration: 0.6,
+          ease: 'power3.inOut',
+        }, '<')
+
+        // 4. Fade out loading screen
+        .to('.loading-screen', { opacity: 0, duration: 0.6, ease: 'power1.inOut' }, '+=0.3');
     });
 
     return () => ctx.revert();
@@ -115,7 +142,7 @@ export default function PhotographyPage() {
   return (
     <div className="bg-[#e5e5e5] text-[#111] min-h-screen font-sans relative overflow-x-hidden">
       
-      {/* 1. PRELOADER INTRO */}
+      {/* 1. PRELOADER INTRO WITH "P" MORPH ANIMATION */}
       {loading && (
         <div className="loading-screen fixed inset-0 z-[100] bg-black text-white flex items-center justify-center pointer-events-none">
           <div className="counter absolute bottom-12 left-12 flex h-[100px] text-[100px] leading-none overflow-hidden font-mono">
@@ -139,10 +166,12 @@ export default function PhotographyPage() {
             <div ref={counter3Ref} className="counter-3 digit relative -top-[15px]" />
           </div>
 
-          {/* Loader bar forming P */}
-          <div className="loader absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[240px] h-[40px] flex bg-zinc-800">
-            <div className="loader-1 bg-white w-[160px] h-full" />
-            <div className="loader-2 bg-white w-[80px] h-full" />
+          {/* Clean 'P' Morph Loader Container */}
+          <div className="relative w-[180px] h-[140px] flex items-center justify-center">
+            {/* Stem of P (Left vertical line) */}
+            <div className="loader-stem absolute bg-white h-[18px] w-[120px] rounded-sm" />
+            {/* Top Loop of P (Attached to upper right) */}
+            <div className="loader-loop absolute border-white border-solid border-[16px] border-l-0 rounded-r-full" />
           </div>
         </div>
       )}
