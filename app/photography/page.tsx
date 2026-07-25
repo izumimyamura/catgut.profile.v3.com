@@ -132,8 +132,12 @@ function PhoneModel({ path }: { path: string }) {
 // Preload GLTF model
 useGLTF.preload('/nothing3a.glb');
 
-// Image assets mapping (img1 to img12)
+// Combined Gallery Assets (photo1 - photo4 + img1 - img12)
 const galleryPhotos = [
+  { id: 'p1', src: '/photo1.jpg', isVertical: false, title: 'EXHIBIT // ISO 100 • 24mm' },
+  { id: 'p2', src: '/photo2.jpg', isVertical: true, title: 'EXHIBIT // MONOCHROME PORTRAIT' },
+  { id: 'p3', src: '/photo3.jpg', isVertical: false, title: 'EXHIBIT // HIGH CONTRAST NIGHT' },
+  { id: 'p4', src: '/photo4.jpg', isVertical: false, title: 'EXHIBIT // MINIMAL GEOMETRY' },
   { id: 1, src: '/img1.jpeg', isVertical: true, title: '01 // PORTRAIT SHADOW' },
   { id: 2, src: '/img2.jpeg', isVertical: false, title: '02 // URBAN SILHOUETTE' },
   { id: 3, src: '/img3.jpeg', isVertical: false, title: '03 // ARCHITECTURAL DEPTH' },
@@ -447,17 +451,17 @@ export default function PhotographyPage() {
         </div>
       </section>
 
-      {/* 6. NEW: MASONRY / BENTO GALLERY GRID (img1.jpeg to img12.jpeg) */}
+      {/* 6. MASONRY / BENTO GALLERY GRID (photo1-photo4 + img1-img12) */}
       <section className="py-24 px-6 md:px-12 max-w-[1400px] mx-auto border-t border-zinc-800">
         <div className="mb-12 flex justify-between items-end">
           <div>
             <span className="text-xs text-red-500 font-bold uppercase tracking-widest">[ SHOT ON NOTHING (3A) ]</span>
             <h2 className="text-4xl md:text-5xl font-black tracking-tight mt-2 uppercase">GALLERY GRID</h2>
           </div>
-          <span className="text-xs text-zinc-500 font-mono">12 ARCHIVAL CAPTURES</span>
+          <span className="text-xs text-zinc-500 font-mono">16 ARCHIVAL CAPTURES</span>
         </div>
 
-        {/* Dynamic Masonry Grid targeting vertical vs horizontal images */}
+        {/* Dynamic Masonry Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 auto-rows-[220px] gap-6">
           {galleryPhotos.map((item) => (
             <div
