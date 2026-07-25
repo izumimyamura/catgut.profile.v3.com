@@ -15,10 +15,25 @@ function LiquidCanvas() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    let width = (canvas.width = window.innerWidth);
-    let height = (canvas.height = window.innerHeight);
+    let width = 0;
+    let height = 0;
+    let dpr = 1;
 
     const points: Array<{ x: number; y: number; age: number; maxAge: number; size: number }> = [];
+
+    const resize = () => {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      ctx.scale(dpr, dpr);
+    };
+
+    resize();
+    window.addEventListener('resize', resize);
 
     const handleMouseMove = (e: MouseEvent) => {
       const rect = canvas.getBoundingClientRect();
@@ -32,12 +47,6 @@ function LiquidCanvas() {
     };
 
     window.addEventListener('mousemove', handleMouseMove);
-
-    const handleResize = () => {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-    };
-    window.addEventListener('resize', handleResize);
 
     let animId: number;
     const render = () => {
@@ -72,7 +81,7 @@ function LiquidCanvas() {
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('resize', resize);
       cancelAnimationFrame(animId);
     };
   }, []);
@@ -91,13 +100,16 @@ function PhoneModel({ path }: { path: string }) {
   return <primitive object={scene} scale={32} position={[0, -1.8, 0]} rotation={[0, Math.PI, 0]} />;
 }
 
+// Preload GLTF model for smoother render
+useGLTF.preload('/nothing3a.glb');
+
 export default function PhotographyPage() {
   const [loading, setLoading] = useState(true);
   const [glyphMode, setGlyphMode] = useState<'off' | 'all' | 'torch'>('all');
   const counter3Ref = useRef<HTMLDivElement>(null);
   const sliderWrapperRef = useRef<HTMLDivElement>(null);
 
-  // 1. Accelerated GSAP Preloader Animation
+  // 1. GSAP Preloader Animation
   useEffect(() => {
     const counter3 = counter3Ref.current;
     if (counter3) {
@@ -121,7 +133,6 @@ export default function PhotographyPage() {
         onComplete: () => setLoading(false),
       });
 
-      // Faster timeline sequence (~1.2 seconds total)
       tl.to('.counter-3', { y: -1900, duration: 0.9, ease: 'power2.inOut' })
         .to('.counter-2', { y: -900, duration: 0.9, ease: 'power2.inOut' }, 0)
         .to('.counter-1', { y: -100, duration: 0.5, ease: 'power2.inOut' }, 0.4)
@@ -169,12 +180,12 @@ export default function PhotographyPage() {
     const wrapper = sliderWrapperRef.current;
     if (!wrapper) return;
 
-    const slides = wrapper.querySelectorAll<HTMLElement>('.slide-card');
-    let maxScroll = wrapper.offsetWidth - window.innerWidth;
+    let maxScroll = Math.max(0, wrapper.offsetWidth - window.innerWidth);
 
     const lerp = (start: number, end: number, factor: number) => start + (end - start) * factor;
 
     const updateScaleAndPosition = () => {
+      const slides = wrapper.querySelectorAll<HTMLElement>('.slide-card');
       slides.forEach((slide) => {
         const rect = slide.getBoundingClientRect();
         const centerPosition = (rect.left + rect.right) / 2;
@@ -208,16 +219,20 @@ export default function PhotographyPage() {
     };
 
     const handleResize = () => {
-      maxScroll = wrapper.offsetWidth - window.innerWidth;
+      maxScroll = Math.max(0, wrapper.offsetWidth - window.innerWidth);
     };
 
-    window.addEventListener('wheel', handleWheel);
+    const resizeObserver = new ResizeObserver(() => handleResize());
+    resizeObserver.observe(wrapper);
+
+    window.addEventListener('wheel', handleWheel, { passive: true });
     window.addEventListener('resize', handleResize);
     update();
 
     return () => {
       window.removeEventListener('wheel', handleWheel);
       window.removeEventListener('resize', handleResize);
+      resizeObserver.disconnect();
       cancelAnimationFrame(animationFrameId);
     };
   }, [loading]);
@@ -282,7 +297,7 @@ export default function PhotographyPage() {
           </p>
         </div>
 
-        {/* BIGGER 3D PHONE BOX CONTAINER */}
+        {/* 3D PHONE BOX CONTAINER */}
         <div className="w-full max-w-4xl h-[650px] md:h-[720px] relative my-6 border border-zinc-800 rounded-3xl bg-zinc-950/80 shadow-[0_20px_80px_rgba(0,0,0,0.9)] overflow-hidden z-20 transition-all duration-500">
           <Canvas camera={{ position: [0, 0, 5], fov: 42 }}>
             <ambientLight intensity={glyphMode === 'off' ? 0.6 : glyphMode === 'torch' ? 3.0 : 4.5} />
