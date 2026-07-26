@@ -2,16 +2,17 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 
-// Your 5 custom video/audio tracks placed in /public
+// Track mapping pointing correctly to .mp3 files in /public
 const tracks = [
-  { id: 'song1', title: 'Track 01', src: '/song1.mp4' },
-  { id: 'song2', title: 'Track 02', src: '/song2.mp4' },
-  { id: 'song3', title: 'Track 03', src: '/song3.mp4' },
-  { id: 'song4', title: 'Track 04', src: '/song4.mp4' },
-  { id: 'song5', title: 'Track 05', src: '/song5.mp4' },
+  { id: 'song1', title: 'Track 01', src: '/song1.mp3' },
+  { id: 'song2', title: 'Track 02', src: '/song2.mp3' },
+  { id: 'song3', title: 'Track 03', src: '/song3.mp3' },
+  { id: 'song4', title: 'Track 04', src: '/song4.mp3' },
+  { id: 'song5', title: 'Track 05', src: '/song5.mp3' },
 ];
 
 export default function SoundsPage() {
+  const [loading, setLoading] = useState(true);
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [powerMain, setPowerMain] = useState(true);
@@ -31,7 +32,7 @@ export default function SoundsPage() {
   const [mix, setMix] = useState(100);
 
   // Web Audio Node References
-  const mediaRef = useRef<HTMLVideoElement | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
@@ -42,6 +43,14 @@ export default function SoundsPage() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const animFrameRef = useRef<number | null>(null);
 
+  // Simulated Preloader Timer
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1800);
+    return () => clearTimeout(timer);
+  }, []);
+
   // Initialize Web Audio API Pipeline
   const initAudioCtx = () => {
     if (audioCtxRef.current) return;
@@ -49,8 +58,8 @@ export default function SoundsPage() {
     const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
     audioCtxRef.current = ctx;
 
-    if (!mediaRef.current) return;
-    const source = ctx.createMediaElementSource(mediaRef.current);
+    if (!audioRef.current) return;
+    const source = ctx.createMediaElementSource(audioRef.current);
 
     const low = ctx.createBiquadFilter();
     low.type = 'lowshelf';
@@ -91,7 +100,7 @@ export default function SoundsPage() {
 
   // Play / Pause Toggle
   const togglePlay = () => {
-    if (!mediaRef.current) return;
+    if (!audioRef.current) return;
     initAudioCtx();
 
     if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
@@ -99,10 +108,10 @@ export default function SoundsPage() {
     }
 
     if (isPlaying) {
-      mediaRef.current.pause();
+      audioRef.current.pause();
       setIsPlaying(false);
     } else {
-      mediaRef.current
+      audioRef.current
         .play()
         .then(() => setIsPlaying(true))
         .catch((err) => console.log('Autoplay blocked:', err));
@@ -113,12 +122,12 @@ export default function SoundsPage() {
   const switchTrack = (index: number) => {
     const wasPlaying = isPlaying;
     setCurrentTrackIndex(index);
-    
+
     setTimeout(() => {
-      if (mediaRef.current) {
-        mediaRef.current.currentTime = 0;
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
         if (wasPlaying) {
-          mediaRef.current.play().then(() => setIsPlaying(true));
+          audioRef.current.play().then(() => setIsPlaying(true));
         }
       }
     }, 50);
@@ -280,13 +289,37 @@ export default function SoundsPage() {
   return (
     <div className="bg-[#e4e4e6] text-zinc-800 min-h-screen font-sans relative overflow-x-hidden select-none flex flex-col items-center justify-center py-20 px-4">
       
-      {/* Active Video/Audio Media Player */}
-      <video
-        ref={mediaRef}
+      {/* 1. SOUND WAVE PRELOADER */}
+      {loading && (
+        <div className="fixed inset-0 z-[100] bg-[#111115] text-white flex flex-col items-center justify-center gap-6 transition-opacity duration-500">
+          {/* Animated Sound Wave Bars */}
+          <div className="flex items-end gap-1.5 h-16">
+            {[0.4, 0.8, 1.2, 0.6, 1.0, 0.5, 0.9, 0.3, 0.7, 1.1].map((delay, idx) => (
+              <div
+                key={idx}
+                className="w-2 bg-[#e04f33] rounded-full animate-bounce"
+                style={{
+                  height: '100%',
+                  animationDuration: `${0.6 + delay * 0.4}s`,
+                  animationIterationCount: 'infinite',
+                }}
+              />
+            ))}
+          </div>
+
+          <div className="flex flex-col items-center font-mono">
+            <h2 className="text-xl font-black uppercase tracking-widest text-white">SOUND ENGINE</h2>
+            <p className="text-xs text-zinc-400 mt-1 uppercase tracking-wider">CALIBRATING AUDIO FREQUENCIES...</p>
+          </div>
+        </div>
+      )}
+
+      {/* Active Audio Element (.mp3 Format) */}
+      <audio
+        ref={audioRef}
         src={tracks[currentTrackIndex].src}
         loop
-        playsInline
-        className="hidden"
+        preload="auto"
       />
 
       {/* NAVIGATION BAR */}
