@@ -339,12 +339,12 @@ export default function SoundsPage() {
       {/* Audio File */}
       <audio ref={audioRef} src={tracks[currentTrackIndex].src} loop preload="auto" />
 
-      {/* 2. UNBOXED FLOATING MEME VIDEO (Compact Corner Placement) */}
+      {/* 2. TINY UNBOXED CORNER FLOATING MEME VIDEO */}
       <div
-        className={`fixed bottom-6 right-6 z-40 w-36 md:w-44 pointer-events-none transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform ${
+        className={`fixed bottom-4 right-4 z-40 w-16 md:w-20 pointer-events-none transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform ${
           isPlaying
             ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto'
-            : 'opacity-0 scale-75 translate-y-8 pointer-events-none'
+            : 'opacity-0 scale-75 translate-y-6 pointer-events-none'
         }`}
       >
         <video
@@ -353,7 +353,7 @@ export default function SoundsPage() {
           loop
           muted
           playsInline
-          className="w-full h-auto rounded-2xl object-cover"
+          className="w-full h-auto rounded-xl object-cover drop-shadow-md"
         />
       </div>
 
