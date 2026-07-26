@@ -336,15 +336,15 @@ export default function SoundsPage() {
         </div>
       )}
 
-      {/* Main Track Audio File */}
+      {/* Audio File */}
       <audio ref={audioRef} src={tracks[currentTrackIndex].src} loop preload="auto" />
 
-      {/* 2. APPLE-STYLE FLOATING SOUND MEME VIDEO WIDGET */}
+      {/* 2. UNBOXED FLOATING MEME VIDEO (Compact Corner Placement) */}
       <div
-        className={`fixed bottom-8 right-8 z-40 w-64 md:w-80 rounded-3xl overflow-hidden border border-white/40 bg-black/80 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform ${
+        className={`fixed bottom-6 right-6 z-40 w-36 md:w-44 pointer-events-none transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform ${
           isPlaying
             ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto'
-            : 'opacity-0 scale-75 translate-y-12 pointer-events-none'
+            : 'opacity-0 scale-75 translate-y-8 pointer-events-none'
         }`}
       >
         <video
@@ -353,11 +353,8 @@ export default function SoundsPage() {
           loop
           muted
           playsInline
-          className="w-full h-full object-cover rounded-3xl"
+          className="w-full h-auto rounded-2xl object-cover"
         />
-        <div className="absolute bottom-2 left-3 text-[10px] font-black uppercase tracking-widest text-white/80 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
-          NOW PLAYING // {tracks[currentTrackIndex].title}
-        </div>
       </div>
 
       {/* NAVIGATION BAR */}
@@ -371,7 +368,7 @@ export default function SoundsPage() {
       </nav>
 
       {/* TRACK SELECTOR & GLOBAL ADV SWITCH */}
-      <div className="w-full max-w-5xl mb-6 mt-10 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="w-full max-w-5xl mb-6 mt-10 flex flex-col md:flex-row items-center justify-between gap-4 z-10">
         <div className="flex gap-3 overflow-x-auto p-1 scrollbar-none">
           {tracks.map((track, idx) => (
             <button
@@ -398,7 +395,7 @@ export default function SoundsPage() {
             }`}
           >
             <div
-              className={`w-5 h-5 bg-white rounded-full shadow-md transition-transform ${
+              className={`w-5 h-5 bg-white rounded-full shadow-md transition-transform duration-300 ease-out ${
                 advMode ? 'translate-x-6' : 'translate-x-0'
               }`}
             />
@@ -406,11 +403,17 @@ export default function SoundsPage() {
         </div>
       </div>
 
-      {/* RACK MAIN CONTAINER */}
-      {!advMode ? (
-        /* --- STANDARD 3-PANEL RACK VIEW --- */
-        <div className="w-full max-w-5xl bg-[#ececed] p-8 md:p-12 rounded-[40px] border border-white/80 shadow-[20px_20px_60px_rgba(0,0,0,0.12),-20px_-20px_60px_rgba(255,255,255,0.9)] grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-          
+      {/* MAIN RACK CONTAINER (Smoother Layered Morph Transition) */}
+      <div className="w-full max-w-6xl relative min-h-[520px]">
+
+        {/* --- STANDARD 3-PANEL RACK VIEW --- */}
+        <div
+          className={`w-full max-w-5xl mx-auto bg-[#ececed] p-8 md:p-12 rounded-[40px] border border-white/80 shadow-[20px_20px_60px_rgba(0,0,0,0.12),-20px_-20px_60px_rgba(255,255,255,0.9)] grid grid-cols-1 md:grid-cols-3 gap-8 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+            !advMode
+              ? 'opacity-100 scale-100 pointer-events-auto relative z-10'
+              : 'opacity-0 scale-95 pointer-events-none absolute inset-0 z-0'
+          }`}
+        >
           <div className="absolute -top-6 left-1/2 -translate-x-1/2 z-20">
             <button
               onClick={togglePlay}
@@ -525,11 +528,16 @@ export default function SoundsPage() {
           </div>
 
         </div>
-      ) : (
-        /* --- FULL ADVANCED (ADV) EXPANDED CONSOLE VIEW --- */
-        <div className="w-full max-w-6xl bg-[#ececed] p-6 md:p-8 rounded-[40px] border border-white/80 shadow-[20px_20px_60px_rgba(0,0,0,0.12),-20px_-20px_60px_rgba(255,255,255,0.9)] grid grid-cols-1 md:grid-cols-5 gap-4 relative animate-fadeIn">
-          
-          {/* Panel 1: De-Esser / Dynamic Comp */}
+
+        {/* --- FULL ADVANCED (ADV) EXPANDED CONSOLE VIEW --- */}
+        <div
+          className={`w-full bg-[#ececed] p-6 md:p-8 rounded-[40px] border border-white/80 shadow-[20px_20px_60px_rgba(0,0,0,0.12),-20px_-20px_60px_rgba(255,255,255,0.9)] grid grid-cols-1 md:grid-cols-5 gap-4 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+            advMode
+              ? 'opacity-100 scale-100 pointer-events-auto relative z-10'
+              : 'opacity-0 scale-95 pointer-events-none absolute inset-0 z-0'
+          }`}
+        >
+          {/* Panel 1: De-Esser */}
           <div className="bg-[#f0f0f2] rounded-3xl p-4 border border-white/70 shadow-sm flex flex-col justify-between items-center text-center">
             <div className="w-full flex justify-between items-center mb-2">
               <button className="text-xs text-zinc-400">⏻</button>
@@ -725,7 +733,8 @@ export default function SoundsPage() {
           </div>
 
         </div>
-      )}
+
+      </div>
 
     </div>
   );
