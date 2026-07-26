@@ -15,14 +15,14 @@ export default function SoundsPage() {
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [powerMain, setPowerMain] = useState(true);
-  const [advMode, setAdvMode] = useState(false); // Global ADV Toggle
+  const [advMode, setAdvMode] = useState(false);
   const [speedMode, setSpeedMode] = useState<'fast' | 'slow' | 'auto'>('fast');
 
   // Active Preset Selectors for ADV View
-  const [preset1, setPreset1] = useState(0); // Clean
-  const [preset2, setPreset2] = useState(0); // Room
-  const [preset3, setPreset3] = useState(0); // Tape
-  const [preset4, setPreset4] = useState(0); // Analog
+  const [preset1, setPreset1] = useState(0);
+  const [preset2, setPreset2] = useState(0);
+  const [preset3, setPreset3] = useState(0);
+  const [preset4, setPreset4] = useState(0);
 
   const presetsList = {
     p1: ['CLEAN', 'VOCAL', 'DYNAMIC'],
@@ -54,8 +54,9 @@ export default function SoundsPage() {
   const [reverbVal, setReverbVal] = useState(45);
   const [delayVal, setDelayVal] = useState(30);
 
-  // Audio Node References
+  // References
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const memeVideoRef = useRef<HTMLVideoElement | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
@@ -134,9 +135,13 @@ export default function SoundsPage() {
 
     if (isPlaying) {
       audioRef.current.pause();
+      if (memeVideoRef.current) memeVideoRef.current.pause();
       setIsPlaying(false);
     } else {
-      audioRef.current.play().then(() => setIsPlaying(true)).catch((err) => console.log(err));
+      audioRef.current.play().then(() => {
+        setIsPlaying(true);
+        if (memeVideoRef.current) memeVideoRef.current.play();
+      }).catch((err) => console.log(err));
     }
   };
 
@@ -146,7 +151,12 @@ export default function SoundsPage() {
     setTimeout(() => {
       if (audioRef.current) {
         audioRef.current.currentTime = 0;
-        if (wasPlaying) audioRef.current.play().then(() => setIsPlaying(true));
+        if (wasPlaying) {
+          audioRef.current.play().then(() => {
+            setIsPlaying(true);
+            if (memeVideoRef.current) memeVideoRef.current.play();
+          });
+        }
       }
     }, 50);
   };
@@ -160,7 +170,7 @@ export default function SoundsPage() {
     if (gainNodeRef.current) gainNodeRef.current.gain.value = powerMain ? (level / 100) * (output / 100) : 0;
   }, [eqLow, eqMid, eqHigh, eqAir, lowCut, level, output, powerMain]);
 
-  // Visualizer renderer for screens
+  // Visualizer Canvas Renderer
   useEffect(() => {
     const drawGraph = (canvas: HTMLCanvasElement | null) => {
       if (!canvas) return;
@@ -239,7 +249,7 @@ export default function SoundsPage() {
     };
   }, [isPlaying, powerMain, eqLow, eqMid, eqHigh, eqAir]);
 
-  // Rotatable Knob Sub-component
+  // Rotatable Knob
   const Knob = ({
     label,
     value,
@@ -326,7 +336,29 @@ export default function SoundsPage() {
         </div>
       )}
 
+      {/* Main Track Audio File */}
       <audio ref={audioRef} src={tracks[currentTrackIndex].src} loop preload="auto" />
+
+      {/* 2. APPLE-STYLE FLOATING SOUND MEME VIDEO WIDGET */}
+      <div
+        className={`fixed bottom-8 right-8 z-40 w-64 md:w-80 rounded-3xl overflow-hidden border border-white/40 bg-black/80 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform ${
+          isPlaying
+            ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto'
+            : 'opacity-0 scale-75 translate-y-12 pointer-events-none'
+        }`}
+      >
+        <video
+          ref={memeVideoRef}
+          src="/soundmeme.mp4"
+          loop
+          muted
+          playsInline
+          className="w-full h-full object-cover rounded-3xl"
+        />
+        <div className="absolute bottom-2 left-3 text-[10px] font-black uppercase tracking-widest text-white/80 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
+          NOW PLAYING // {tracks[currentTrackIndex].title}
+        </div>
+      </div>
 
       {/* NAVIGATION BAR */}
       <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-6 px-6 py-3 bg-zinc-900/90 text-white backdrop-blur-md rounded-full border border-white/10 text-xs font-bold uppercase tracking-widest shadow-2xl">
@@ -338,7 +370,7 @@ export default function SoundsPage() {
         <span className="px-3 py-1 bg-white text-black rounded-full">Sounds</span>
       </nav>
 
-      {/* APPLE-STYLE TRACK SELECTOR & GLOBAL ADV SWITCH */}
+      {/* TRACK SELECTOR & GLOBAL ADV SWITCH */}
       <div className="w-full max-w-5xl mb-6 mt-10 flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="flex gap-3 overflow-x-auto p-1 scrollbar-none">
           {tracks.map((track, idx) => (
@@ -504,14 +536,12 @@ export default function SoundsPage() {
               <button className="text-xs text-zinc-400">↺</button>
             </div>
 
-            {/* Black Preset Box */}
             <div className="w-full bg-[#1e1e24] text-white p-3 rounded-2xl flex items-center justify-between shadow-inner">
               <button onClick={() => setPreset1((preset1 + 2) % 3)} className="text-xs">‹</button>
               <span className="text-xs font-black tracking-widest">{presetsList.p1[preset1]}</span>
               <button onClick={() => setPreset1((preset1 + 1) % 3)} className="text-xs">›</button>
             </div>
 
-            {/* Transfer Curve Display */}
             <div className="w-full bg-zinc-200 rounded-xl h-16 my-3 border border-zinc-300 relative flex items-center justify-center">
               <svg className="w-full h-full p-1" viewBox="0 0 100 50">
                 <path d="M 10 40 Q 50 40 80 15" fill="none" stroke="#333" strokeWidth="2" />
@@ -519,7 +549,6 @@ export default function SoundsPage() {
               </svg>
             </div>
 
-            {/* Controls */}
             <div className="w-full space-y-3 my-2">
               <div className="flex justify-around items-center">
                 <Knob label="Freq" value={dsFreq} onChange={setDsFreq} size="sm" />
@@ -529,7 +558,6 @@ export default function SoundsPage() {
                 </div>
               </div>
 
-              {/* DS Vertical Slider */}
               <div className="flex items-center justify-center gap-2 my-2">
                 <span className="text-[9px] font-bold">DS</span>
                 <input
@@ -565,7 +593,6 @@ export default function SoundsPage() {
               <button onClick={() => setPreset2((preset2 + 1) % 3)} className="text-xs">›</button>
             </div>
 
-            {/* Reverb/Delay Dual Faders */}
             <div className="w-full bg-zinc-200/80 rounded-xl p-3 my-3 border border-zinc-300 grid grid-cols-2 gap-2 text-[8px] font-bold">
               <div className="flex flex-col items-center">
                 <span>REVERB</span>
@@ -593,7 +620,6 @@ export default function SoundsPage() {
 
             <Knob label="LEVEL" value={level} onChange={setLevel} size="lg" />
 
-            {/* In / Out Dual Faders */}
             <div className="w-full flex justify-center gap-6 my-4">
               <div className="flex flex-col items-center">
                 <input
@@ -684,7 +710,6 @@ export default function SoundsPage() {
               ))}
             </div>
 
-            {/* Low-Cut Slider */}
             <div className="w-full mt-2">
               <span className="text-xs font-bold text-zinc-700">{lowCut} Hz</span>
               <input
