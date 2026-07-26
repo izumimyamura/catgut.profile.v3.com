@@ -52,18 +52,21 @@ function Meteors({ count = 25 }: { count?: number }) {
 /* --- 3D GLTF Model Viewer --- */
 function SpaceModel({ path, scale = 2.8 }: { path: string; scale?: number }) {
   const { scene } = useGLTF(path);
-  return <primitive object={scene} scale={scale} position={[0, -0.2, 0]} />;
+  // Clone scene to avoid shared state across different models
+  const clonedScene = React.useMemo(() => scene.clone(), [scene]);
+  return <primitive object={clonedScene} scale={scale} position={[0, -0.2, 0]} />;
 }
 
-// Preload galaxy2.glb for instant rendering
+// Preload models
 useGLTF.preload('/galaxy2.glb');
+useGLTF.preload('/galaxy.glb');
 
-// Data mapping for Celestial Bodies & Facts
+// Separate model files mapped to each topic
 const spaceTopics = [
   {
     id: 'milkyway',
     title: '1. Milky Way',
-    modelPath: '/galaxy2.glb',
+    modelPath: '/galaxy2.glb', // techinz open source galaxy
     scale: 1.8,
     color: '#f59e0b',
     facts: [
@@ -75,7 +78,7 @@ const spaceTopics = [
   {
     id: 'galaxy',
     title: '2. Galaxies & Beyond',
-    modelPath: '/galaxy2.glb',
+    modelPath: '/galaxy.glb', // original particle galaxy model
     scale: 2.8,
     color: '#ef4444',
     facts: [
@@ -162,7 +165,6 @@ export default function SpacePage() {
       {/* 4. FULL-SCREEN 3D CANVAS */}
       <div className="fixed inset-0 z-10 w-full h-full">
         <Canvas camera={{ position: [0, 2.5, 6], fov: 45 }}>
-          {/* Lighting optimized for galaxy textures */}
           <ambientLight intensity={2.0} />
           <directionalLight position={[10, 10, 10]} intensity={1.5} />
           <pointLight position={[0, 0, 0]} intensity={2.0} color="#ffaa00" />
@@ -174,7 +176,7 @@ export default function SpacePage() {
           {/* Red Meteors */}
           <Meteors count={25} />
 
-          {/* Floating Galaxy Model */}
+          {/* Floating Model - keyed by ID so canvas properly swaps objects */}
           <Suspense fallback={null}>
             <Float speed={1.0} rotationIntensity={0.15} floatIntensity={0.15}>
               <SpaceModel key={activeTopic.id} path={activeTopic.modelPath} scale={activeTopic.scale} />
