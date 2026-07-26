@@ -6,10 +6,42 @@ import { useGLTF, OrbitControls, Float, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 import { gsap } from 'gsap';
 
-/* --- Procedural Meteor Shower Component --- */
-function Meteors({ count = 20 }: { count?: number }) {
-  const meshRef = useRef<THREE.InstancedMesh>(null);
+/* --- Glowing Procedural Sun Component --- */
+function Sun() {
+  const sunRef = useRef<THREE.Mesh>(null);
 
+  useFrame(({ clock }) => {
+    if (sunRef.current) {
+      sunRef.current.rotation.y = clock.getElapsedTime() * 0.05;
+    }
+  });
+
+  return (
+    <group position={[-6, 4, -4]}>
+      {/* Sun Core */}
+      <mesh ref={sunRef}>
+        <sphereGeometry args={[1.2, 32, 32]} />
+        <meshBasicMaterial color="#ffaa00" />
+      </mesh>
+      {/* Inner Glow Aura */}
+      <mesh>
+        <sphereGeometry args={[1.4, 32, 32]} />
+        <meshBasicMaterial color="#ff4500" transparent opacity={0.35} />
+      </mesh>
+      {/* Outer Glow Aura */}
+      <mesh>
+        <sphereGeometry args={[1.7, 32, 32]} />
+        <meshBasicMaterial color="#ff8800" transparent opacity={0.15} />
+      </mesh>
+      {/* Sun Light Source */}
+      <pointLight intensity={3.5} color="#ffaa00" distance={25} />
+    </group>
+  );
+}
+
+/* --- Procedural Meteor Shower Component --- */
+function Meteors({ count = 25 }: { count?: number }) {
+  const meshRef = useRef<THREE.InstancedMesh>(null);
   const dummy = useRef(new THREE.Object3D());
   const meteorData = useRef(
     Array.from({ length: count }, () => ({
@@ -17,7 +49,7 @@ function Meteors({ count = 20 }: { count?: number }) {
       y: Math.random() * 40 + 10,
       z: (Math.random() - 0.5) * 80,
       speed: Math.random() * 0.4 + 0.2,
-      length: Math.random() * 2 + 1,
+      length: Math.random() * 2.5 + 1,
     }))
   );
 
@@ -45,18 +77,18 @@ function Meteors({ count = 20 }: { count?: number }) {
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
       <cylinderGeometry args={[0.02, 0.1, 1, 8]} />
-      <meshBasicMaterial color="#ffffff" transparent opacity={0.8} />
+      <meshBasicMaterial color="#93c5fd" transparent opacity={0.8} />
     </instancedMesh>
   );
 }
 
-/* --- Generic 3D GLTF Model Viewer --- */
+/* --- 3D GLTF Model Viewer --- */
 function SpaceModel({ path }: { path: string }) {
   const { scene } = useGLTF(path);
   return <primitive object={scene} scale={2.8} position={[0, -0.5, 0]} />;
 }
 
-// Data mapping for Celestial Bodies & Facts (Saturn & Blackhole removed)
+// Data mapping for Celestial Bodies & Facts
 const spaceTopics = [
   {
     id: 'milkyway',
@@ -152,26 +184,37 @@ export default function SpacePage() {
         </button>
       </nav>
 
-      {/* 3. FULL-SCREEN OPEN 3D CANVAS WITH STARS & METEORS */}
+      {/* 3. FULL-SCREEN OPEN 3D CANVAS WITH MULTI-COLOR STARS, SUN & METEORS */}
       <div className="fixed inset-0 z-0 w-full h-full">
         <Canvas camera={{ position: [0, 0, 7], fov: 45 }}>
-          <ambientLight intensity={1.8} />
-          <pointLight position={[10, 10, 10]} intensity={2.5} />
+          {/* Base Ambient Lighting */}
+          <ambientLight intensity={0.8} />
 
-          {/* Deep Star Field */}
-          <Stars radius={120} depth={60} count={7000} factor={5} saturation={0} fade speed={1.2} />
+          {/* Dynamic Colored Lighting for White/Monochrome Models */}
+          <pointLight position={[6, 4, 5]} intensity={3.5} color="#a855f7" />
+          <pointLight position={[-6, -4, 5]} intensity={3.5} color="#3b82f6" />
+          <pointLight position={[0, 6, -3]} intensity={2.0} color="#eab308" />
+
+          {/* Multi-Colored Star Layers */}
+          <Stars radius={100} depth={50} count={6000} factor={4} saturation={0.8} fade speed={1.0} />
+          <Stars radius={120} depth={70} count={4000} factor={6} saturation={1} fade speed={1.5} />
+          <Stars radius={80} depth={40} count={3000} factor={5} saturation={0.5} fade speed={0.8} />
+
+          {/* Glowing Sun Component */}
+          <Sun />
 
           {/* Shooting Stars / Meteors */}
-          <Meteors count={25} />
+          <Meteors count={30} />
 
           {/* Floating Model */}
           <Suspense fallback={null}>
-            <Float speed={1.8} rotationIntensity={0.4} floatIntensity={0.4}>
+            <Float speed={1.2} rotationIntensity={0.2} floatIntensity={0.2}>
               <SpaceModel path={activeTopic.modelPath} />
             </Float>
           </Suspense>
 
-          <OrbitControls enableZoom={true} autoRotate autoRotateSpeed={1.0} />
+          {/* Orbit Controls (Auto-Rotate Disabled) */}
+          <OrbitControls enableZoom={true} autoRotate={false} enableRotate={true} />
         </Canvas>
       </div>
 
