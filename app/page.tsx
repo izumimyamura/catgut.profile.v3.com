@@ -135,7 +135,7 @@ export default function Home() {
           
           {/* Portfolio Link Button */}
           <a
-            href="https://kavin-portfolio-v2-7x939lrzi-catguy.vercel.app/"
+            href="https://kavin-portfolio-v2-f4r2xcd4b-catguy.vercel.app/"
             target="_blank"
             rel="noopener noreferrer"
             style={{
