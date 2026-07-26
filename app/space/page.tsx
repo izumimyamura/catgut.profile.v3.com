@@ -6,39 +6,6 @@ import { useGLTF, OrbitControls, Float, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 import { gsap } from 'gsap';
 
-/* --- Glowing Procedural Sun Component --- */
-function Sun() {
-  const sunRef = useRef<THREE.Mesh>(null);
-
-  useFrame(({ clock }) => {
-    if (sunRef.current) {
-      sunRef.current.rotation.y = clock.getElapsedTime() * 0.05;
-    }
-  });
-
-  return (
-    <group position={[-6, 4, -4]}>
-      {/* Sun Core */}
-      <mesh ref={sunRef}>
-        <sphereGeometry args={[1.2, 32, 32]} />
-        <meshBasicMaterial color="#ffaa00" />
-      </mesh>
-      {/* Inner Glow Aura */}
-      <mesh>
-        <sphereGeometry args={[1.4, 32, 32]} />
-        <meshBasicMaterial color="#ff4500" transparent opacity={0.35} />
-      </mesh>
-      {/* Outer Glow Aura */}
-      <mesh>
-        <sphereGeometry args={[1.7, 32, 32]} />
-        <meshBasicMaterial color="#ff8800" transparent opacity={0.15} />
-      </mesh>
-      {/* Sun Light Source */}
-      <pointLight intensity={3.5} color="#ffaa00" distance={25} />
-    </group>
-  );
-}
-
 /* --- Procedural Meteor Shower Component --- */
 function Meteors({ count = 25 }: { count?: number }) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
@@ -77,7 +44,7 @@ function Meteors({ count = 25 }: { count?: number }) {
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
       <cylinderGeometry args={[0.02, 0.1, 1, 8]} />
-      <meshBasicMaterial color="#93c5fd" transparent opacity={0.8} />
+      <meshBasicMaterial color="#f87171" transparent opacity={0.8} />
     </instancedMesh>
   );
 }
@@ -94,7 +61,7 @@ const spaceTopics = [
     id: 'milkyway',
     title: '1. Milky Way',
     modelPath: '/milkyway.glb',
-    color: '#a855f7',
+    color: '#ef4444',
     facts: [
       'Contains over 100 to 400 billion stars.',
       'Spans roughly 100,000 light-years across.',
@@ -105,7 +72,7 @@ const spaceTopics = [
     id: 'galaxy',
     title: '2. Galaxies & Beyond',
     modelPath: '/galaxy.glb',
-    color: '#3b82f6',
+    color: '#f87171',
     facts: [
       'The observable universe contains an estimated 2 trillion galaxies.',
       'Andromeda is our closest major neighbor, colliding with us in ~4.5B years.',
@@ -158,7 +125,7 @@ export default function SpacePage() {
       {/* 1. CUSTOM SPACE PRELOADER */}
       {loading && (
         <div className="space-preloader fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center text-center px-6 pointer-events-none">
-          <h1 className="space-title text-7xl md:text-9xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-500 to-indigo-400">
+          <h1 className="space-title text-7xl md:text-9xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-red-500 to-rose-400">
             SPACE
           </h1>
           <p className="space-quote text-zinc-400 text-sm md:text-lg mt-6 max-w-xl font-mono leading-relaxed">
@@ -178,32 +145,32 @@ export default function SpacePage() {
         {/* Audio Toggle Button */}
         <button
           onClick={toggleAudio}
-          className="ml-2 px-3 py-1 rounded-full border border-purple-400/50 text-purple-300 hover:bg-purple-500/20 transition-all flex items-center gap-2 text-[10px]"
+          className="ml-2 px-3 py-1 rounded-full border border-red-500/50 text-red-400 hover:bg-red-500/20 transition-all flex items-center gap-2 text-[10px]"
         >
           <span>{isPlayingAudio ? '🔊 SOUND ON' : '🔇 SOUND OFF'}</span>
         </button>
       </nav>
 
-      {/* 3. FULL-SCREEN OPEN 3D CANVAS WITH MULTI-COLOR STARS, SUN & METEORS */}
+      {/* 3. ATMOSPHERIC RED BACKGROUND BLUR OVERLAY */}
+      <div className="fixed inset-0 z-[1] pointer-events-none bg-[radial-gradient(circle_at_center,_rgba(153,27,27,0.25)_0%,_rgba(0,0,0,0.85)_70%)] backdrop-blur-[2px]" />
+
+      {/* 4. FULL-SCREEN 3D CANVAS WITH RED STARS & METEORS */}
       <div className="fixed inset-0 z-0 w-full h-full">
         <Canvas camera={{ position: [0, 0, 7], fov: 45 }}>
           {/* Base Ambient Lighting */}
-          <ambientLight intensity={0.8} />
+          <ambientLight intensity={0.9} />
 
-          {/* Dynamic Colored Lighting for White/Monochrome Models */}
-          <pointLight position={[6, 4, 5]} intensity={3.5} color="#a855f7" />
-          <pointLight position={[-6, -4, 5]} intensity={3.5} color="#3b82f6" />
-          <pointLight position={[0, 6, -3]} intensity={2.0} color="#eab308" />
+          {/* Dynamic Red & Crimson Lighting for White/Monochrome Models */}
+          <pointLight position={[6, 4, 5]} intensity={4.0} color="#ef4444" />
+          <pointLight position={[-6, -4, 5]} intensity={3.5} color="#dc2626" />
+          <pointLight position={[0, 6, -3]} intensity={2.5} color="#f87171" />
 
-          {/* Multi-Colored Star Layers */}
-          <Stars radius={100} depth={50} count={6000} factor={4} saturation={0.8} fade speed={1.0} />
-          <Stars radius={120} depth={70} count={4000} factor={6} saturation={1} fade speed={1.5} />
-          <Stars radius={80} depth={40} count={3000} factor={5} saturation={0.5} fade speed={0.8} />
+          {/* Layered Red Starfield */}
+          <Stars radius={100} depth={50} count={6000} factor={5} saturation={1} fade speed={1.2} />
+          <Stars radius={120} depth={70} count={4000} factor={7} saturation={1} fade speed={1.8} />
+          <Stars radius={80} depth={40} count={3000} factor={4} saturation={0.8} fade speed={0.8} />
 
-          {/* Glowing Sun Component */}
-          <Sun />
-
-          {/* Shooting Stars / Meteors */}
+          {/* Red Meteors */}
           <Meteors count={30} />
 
           {/* Floating Model */}
@@ -218,19 +185,19 @@ export default function SpacePage() {
         </Canvas>
       </div>
 
-      {/* 4. OVERLAY CONTENT (TITLE, FACTS & SELECTOR) */}
+      {/* 5. OVERLAY CONTENT (TITLE, FACTS & SELECTOR) */}
       <div className="relative z-20 min-h-screen flex flex-col justify-between p-8 md:p-16 pointer-events-none">
         
         {/* Top Information Block */}
         <div className="mt-20 max-w-xl pointer-events-auto">
-          <span className="text-xs uppercase font-bold tracking-widest text-purple-400">[ BOUNDLESS OCEAN ]</span>
+          <span className="text-xs uppercase font-bold tracking-widest text-red-500">[ BOUNDLESS OCEAN ]</span>
           <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tight mt-2" style={{ color: activeTopic.color }}>
             {activeTopic.title}
           </h1>
-          <ul className="mt-4 space-y-2 text-xs md:text-sm text-zinc-300 bg-black/40 backdrop-blur-md p-6 rounded-2xl border border-white/10 max-w-md font-mono leading-relaxed">
+          <ul className="mt-4 space-y-2 text-xs md:text-sm text-zinc-300 bg-black/50 backdrop-blur-md p-6 rounded-2xl border border-red-500/20 max-w-md font-mono leading-relaxed shadow-[0_0_30px_rgba(239,68,68,0.15)]">
             {activeTopic.facts.map((fact, idx) => (
               <li key={idx} className="flex items-start gap-2">
-                <span className="text-purple-400">•</span>
+                <span className="text-red-500">•</span>
                 <span>{fact}</span>
               </li>
             ))}
@@ -246,8 +213,8 @@ export default function SpacePage() {
                 onClick={() => setActiveTopic(topic)}
                 className={`px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-full border backdrop-blur-md transition-all ${
                   activeTopic.id === topic.id
-                    ? 'bg-white text-black border-white shadow-[0_0_25px_rgba(255,255,255,0.6)]'
-                    : 'bg-black/40 text-zinc-400 border-zinc-800 hover:border-zinc-500'
+                    ? 'bg-red-600 text-white border-red-500 shadow-[0_0_25px_rgba(239,68,68,0.7)]'
+                    : 'bg-black/50 text-zinc-400 border-zinc-800 hover:border-red-500/50'
                 }`}
               >
                 {topic.title}
