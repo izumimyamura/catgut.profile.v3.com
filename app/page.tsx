@@ -128,7 +128,7 @@ export default function Home() {
           <a href="#hero" style={{ color: '#e5e5e5', textDecoration: 'none' }}>Home</a>
           <a href="/projects" style={{ color: '#e5e5e5', textDecoration: 'none' }}>Projects</a>
           <a href="/photography" style={{ color: '#e5e5e5', textDecoration: 'none' }}>Photography</a>
-          <a href="#stack" style={{ color: '#e5e5e5', textDecoration: 'none' }}>My Stack</a>
+          <a href="/space" style={{ color: '#A855F7', textDecoration: 'none', fontWeight: 700 }}>Space</a>
           <a href="/timeline" style={{ color: '#EAB308', textDecoration: 'none', fontWeight: 700 }}>My Timeline</a>
           <a href="#motion-skills" style={{ color: '#e5e5e5', textDecoration: 'none' }}>Motion Suite</a>
           <a href="#software-slider" style={{ color: '#e5e5e5', textDecoration: 'none' }}>Software</a>
