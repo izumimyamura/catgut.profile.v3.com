@@ -151,19 +151,19 @@ export default function SpacePage() {
         </button>
       </nav>
 
-      {/* 3. ATMOSPHERIC RED BACKGROUND BLUR OVERLAY */}
-      <div className="fixed inset-0 z-[1] pointer-events-none bg-[radial-gradient(circle_at_center,_rgba(153,27,27,0.25)_0%,_rgba(0,0,0,0.85)_70%)] backdrop-blur-[2px]" />
+      {/* 3. ATMOSPHERIC RED BACKGROUND GRADIENT (Moved behind Canvas at z-0) */}
+      <div className="fixed inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_center,_rgba(153,27,27,0.25)_0%,_rgba(0,0,0,0.95)_75%)]" />
 
-      {/* 4. FULL-SCREEN 3D CANVAS WITH RED STARS & METEORS */}
-      <div className="fixed inset-0 z-0 w-full h-full">
+      {/* 4. FULL-SCREEN 3D CANVAS WITH RED STARS & METEORS (Placed at z-10) */}
+      <div className="fixed inset-0 z-10 w-full h-full">
         <Canvas camera={{ position: [0, 0, 7], fov: 45 }}>
           {/* Base Ambient Lighting */}
-          <ambientLight intensity={0.9} />
+          <ambientLight intensity={1.2} />
 
           {/* Dynamic Red & Crimson Lighting for White/Monochrome Models */}
-          <pointLight position={[6, 4, 5]} intensity={4.0} color="#ef4444" />
-          <pointLight position={[-6, -4, 5]} intensity={3.5} color="#dc2626" />
-          <pointLight position={[0, 6, -3]} intensity={2.5} color="#f87171" />
+          <pointLight position={[6, 4, 5]} intensity={4.5} color="#ef4444" />
+          <pointLight position={[-6, -4, 5]} intensity={3.8} color="#dc2626" />
+          <pointLight position={[0, 6, -3]} intensity={2.8} color="#f87171" />
 
           {/* Layered Red Starfield */}
           <Stars radius={100} depth={50} count={6000} factor={5} saturation={1} fade speed={1.2} />
