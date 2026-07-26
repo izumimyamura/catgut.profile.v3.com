@@ -131,7 +131,7 @@ export default function Home() {
           <a href="/space" style={{ color: '#A855F7', textDecoration: 'none', fontWeight: 700 }}>Space</a>
           <a href="/timeline" style={{ color: '#EAB308', textDecoration: 'none', fontWeight: 700 }}>My Timeline</a>
           <a href="#motion-skills" style={{ color: '#e5e5e5', textDecoration: 'none' }}>Motion Suite</a>
-          <a href="#software-slider" style={{ color: '#e5e5e5', textDecoration: 'none' }}>Software</a>
+          <a href="/sounds" style={{ color: '#ef4444', textDecoration: 'none', fontWeight: 700 }}>Sounds</a>
           
           {/* Portfolio Link Button */}
           <a
