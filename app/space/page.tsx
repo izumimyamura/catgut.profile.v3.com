@@ -1,59 +1,82 @@
 'use client';
 
 import React, { useState, useEffect, useRef, Suspense } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { useGLTF, OrbitControls, Float, Stars } from '@react-three/drei';
+import * as THREE from 'three';
 import { gsap } from 'gsap';
 
-// Generic 3D GLTF Model Viewer Component
-function SpaceModel({ path }: { path: string }) {
-  const { scene } = useGLTF(path);
-  return <primitive object={scene} scale={2.5} position={[0, 0, 0]} />;
+/* --- Procedural Meteor Shower Component --- */
+function Meteors({ count = 20 }: { count?: number }) {
+  const meshRef = useRef<THREE.InstancedMesh>(null);
+
+  const dummy = useRef(new THREE.Object3D());
+  const meteorData = useRef(
+    Array.from({ length: count }, () => ({
+      x: (Math.random() - 0.5) * 80,
+      y: Math.random() * 40 + 10,
+      z: (Math.random() - 0.5) * 80,
+      speed: Math.random() * 0.4 + 0.2,
+      length: Math.random() * 2 + 1,
+    }))
+  );
+
+  useFrame(() => {
+    if (!meshRef.current) return;
+    meteorData.current.forEach((m, i) => {
+      m.y -= m.speed;
+      m.x -= m.speed * 0.6;
+
+      if (m.y < -30) {
+        m.y = Math.random() * 40 + 20;
+        m.x = (Math.random() - 0.5) * 80;
+      }
+
+      dummy.current.position.set(m.x, m.y, m.z);
+      dummy.current.rotation.z = Math.PI / 4;
+      dummy.current.scale.set(0.08, m.length, 0.08);
+      dummy.current.updateMatrix();
+
+      meshRef.current?.setMatrixAt(i, dummy.current.matrix);
+    });
+    meshRef.current.instanceMatrix.needsUpdate = true;
+  });
+
+  return (
+    <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
+      <cylinderGeometry args={[0.02, 0.1, 1, 8]} />
+      <meshBasicMaterial color="#ffffff" transparent opacity={0.8} />
+    </instancedMesh>
+  );
 }
 
-// Data mapping for Celestial Bodies & Facts
+/* --- Generic 3D GLTF Model Viewer --- */
+function SpaceModel({ path }: { path: string }) {
+  const { scene } = useGLTF(path);
+  return <primitive object={scene} scale={2.8} position={[0, -0.5, 0]} />;
+}
+
+// Data mapping for Celestial Bodies & Facts (Saturn & Blackhole removed)
 const spaceTopics = [
   {
     id: 'milkyway',
     title: '1. Milky Way',
     modelPath: '/milkyway.glb',
-    color: '#8b5cf6',
+    color: '#a855f7',
     facts: [
       'Contains over 100 to 400 billion stars.',
       'Spans roughly 100,000 light-years across.',
-      'Houses a supermassive black hole named Sagittarius A* at its center.',
-    ],
-  },
-  {
-    id: 'blackhole',
-    title: '2. Black Hole',
-    modelPath: '/blackhole.glb',
-    color: '#ec4899',
-    facts: [
-      'Gravitational pull is so immense that even light cannot escape.',
-      'Time significantly slows down near the Event Horizon.',
-      'Spaghetti-fication occurs when object tidally stretches near the core.',
-    ],
-  },
-  {
-    id: 'saturn',
-    title: '3. Saturn',
-    modelPath: '/saturn.glb',
-    color: '#eab308',
-    facts: [
-      'Famous for its prominent ring system composed mostly of ice and rock particles.',
-      'It is a gas giant with an average density lower than water.',
-      'Has over 140 confirmed moons, including Titan and Enceladus.',
+      'Houses a supermassive black hole named Sagittarius A* at its core.',
     ],
   },
   {
     id: 'galaxy',
-    title: '4. Galaxies & Beyond',
+    title: '2. Galaxies & Beyond',
     modelPath: '/galaxy.glb',
     color: '#3b82f6',
     facts: [
       'The observable universe contains an estimated 2 trillion galaxies.',
-      'Andromeda is our closest major neighbor, colliding with us in ~4.5 billion years.',
+      'Andromeda is our closest major neighbor, colliding with us in ~4.5B years.',
       'Dark Matter makes up about 85% of total matter in the cosmos.',
     ],
   },
@@ -61,7 +84,8 @@ const spaceTopics = [
 
 export default function SpacePage() {
   const [loading, setLoading] = useState(true);
-  const [activeTopic, setActiveTopic] = useState<typeof spaceTopics[0] | null>(null);
+  const [activeTopic, setActiveTopic] = useState(spaceTopics[0]);
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // 1. GSAP Preloader Animation
@@ -73,32 +97,36 @@ export default function SpacePage() {
 
       tl.fromTo('.space-title', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' })
         .fromTo('.space-quote', { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, '-=0.4')
-        .to('.space-preloader', { opacity: 0, duration: 0.6, delay: 0.8, ease: 'power2.inOut' });
+        .to('.space-preloader', { opacity: 0, duration: 0.6, delay: 1.0, ease: 'power2.inOut' });
     });
 
     return () => ctx.revert();
   }, []);
 
-  // 2. Play Background Audio
-  useEffect(() => {
-    if (!loading && audioRef.current) {
-      audioRef.current.play().catch(() => {
-        // Handle browser autoplay policy restrictions
-        console.log('Autoplay deferred until user interaction');
-      });
+  // 2. Sound Toggle Handler
+  const toggleAudio = () => {
+    if (!audioRef.current) return;
+    if (isPlayingAudio) {
+      audioRef.current.pause();
+      setIsPlayingAudio(false);
+    } else {
+      audioRef.current
+        .play()
+        .then(() => setIsPlayingAudio(true))
+        .catch((err) => console.log('Audio playback blocked:', err));
     }
-  }, [loading]);
+  };
 
   return (
-    <div className="bg-black text-white min-h-screen font-mono relative overflow-x-hidden select-none">
+    <div className="bg-black text-white min-h-screen font-mono relative overflow-hidden select-none">
       
-      {/* Background Audio */}
-      <audio ref={audioRef} src="/space-ambient.mp3" loop preloader="auto" />
+      {/* Background Audio Stream */}
+      <audio ref={audioRef} src="/space-ambient.mp3" loop preload="auto" />
 
       {/* 1. CUSTOM SPACE PRELOADER */}
       {loading && (
-        <div className="space-preloader fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center text-center px-6">
-          <h1 className="space-title text-7xl md:text-9xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-500 to-amber-400">
+        <div className="space-preloader fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center text-center px-6 pointer-events-none">
+          <h1 className="space-title text-7xl md:text-9xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-500 to-indigo-400">
             SPACE
           </h1>
           <p className="space-quote text-zinc-400 text-sm md:text-lg mt-6 max-w-xl font-mono leading-relaxed">
@@ -107,96 +135,89 @@ export default function SpacePage() {
         </div>
       )}
 
-      {/* 2. NAVIGATION BAR */}
+      {/* 2. NAVIGATION BAR WITH SOUND TOGGLE */}
       <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-6 px-6 py-3 bg-white/10 backdrop-blur-md rounded-full border border-white/10 text-xs font-bold uppercase tracking-widest mix-blend-difference">
         <a href="/" className="hover:opacity-60 transition-opacity">Home</a>
         <a href="/projects" className="hover:opacity-60 transition-opacity">Projects</a>
         <a href="/photography" className="hover:opacity-60 transition-opacity">Photography</a>
         <span className="px-3 py-1 bg-white text-black rounded-full">Space</span>
         <a href="/timeline" className="hover:opacity-60 transition-opacity">Timeline</a>
+
+        {/* Audio Toggle Button */}
+        <button
+          onClick={toggleAudio}
+          className="ml-2 px-3 py-1 rounded-full border border-purple-400/50 text-purple-300 hover:bg-purple-500/20 transition-all flex items-center gap-2 text-[10px]"
+        >
+          <span>{isPlayingAudio ? '🔊 SOUND ON' : '🔇 SOUND OFF'}</span>
+        </button>
       </nav>
 
-      {/* 3. HERO CONTENT */}
-      <main className="pt-32 pb-20 px-6 max-w-[1400px] mx-auto relative z-20">
-        <div className="text-center mb-16">
-          <span className="text-xs uppercase text-purple-400 font-bold tracking-widest">[ COSMIC EXPLORATION ]</span>
-          <h1 className="text-5xl md:text-7xl font-black tracking-tight mt-3 uppercase">COSMIC ARCHIVE</h1>
-          <p className="text-zinc-400 text-xs md:text-sm mt-3 max-w-lg mx-auto">
-            Click any entry below to inspect facts and load the interactive 3D celestial rendering.
-          </p>
+      {/* 3. FULL-SCREEN OPEN 3D CANVAS WITH STARS & METEORS */}
+      <div className="fixed inset-0 z-0 w-full h-full">
+        <Canvas camera={{ position: [0, 0, 7], fov: 45 }}>
+          <ambientLight intensity={1.8} />
+          <pointLight position={[10, 10, 10]} intensity={2.5} />
+
+          {/* Deep Star Field */}
+          <Stars radius={120} depth={60} count={7000} factor={5} saturation={0} fade speed={1.2} />
+
+          {/* Shooting Stars / Meteors */}
+          <Meteors count={25} />
+
+          {/* Floating Model */}
+          <Suspense fallback={null}>
+            <Float speed={1.8} rotationIntensity={0.4} floatIntensity={0.4}>
+              <SpaceModel path={activeTopic.modelPath} />
+            </Float>
+          </Suspense>
+
+          <OrbitControls enableZoom={true} autoRotate autoRotateSpeed={1.0} />
+        </Canvas>
+      </div>
+
+      {/* 4. OVERLAY CONTENT (TITLE, FACTS & SELECTOR) */}
+      <div className="relative z-20 min-h-screen flex flex-col justify-between p-8 md:p-16 pointer-events-none">
+        
+        {/* Top Information Block */}
+        <div className="mt-20 max-w-xl pointer-events-auto">
+          <span className="text-xs uppercase font-bold tracking-widest text-purple-400">[ BOUNDLESS OCEAN ]</span>
+          <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tight mt-2" style={{ color: activeTopic.color }}>
+            {activeTopic.title}
+          </h1>
+          <ul className="mt-4 space-y-2 text-xs md:text-sm text-zinc-300 bg-black/40 backdrop-blur-md p-6 rounded-2xl border border-white/10 max-w-md font-mono leading-relaxed">
+            {activeTopic.facts.map((fact, idx) => (
+              <li key={idx} className="flex items-start gap-2">
+                <span className="text-purple-400">•</span>
+                <span>{fact}</span>
+              </li>
+            ))}
+          </ul>
         </div>
 
-        {/* FACT CARDS GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {spaceTopics.map((topic) => (
-            <div
-              key={topic.id}
-              onClick={() => setActiveTopic(topic)}
-              className="group cursor-pointer bg-zinc-950/80 border border-zinc-800 hover:border-zinc-500 p-6 rounded-3xl transition-all duration-300 hover:-translate-y-2 flex flex-col justify-between min-h-[320px] relative overflow-hidden"
-            >
-              <div>
-                <h3 className="text-2xl font-black uppercase mb-4" style={{ color: topic.color }}>
-                  {topic.title}
-                </h3>
-                <ul className="space-y-3 text-xs text-zinc-400 font-mono">
-                  {topic.facts.map((fact, idx) => (
-                    <li key={idx} className="flex items-start gap-2">
-                      <span className="text-zinc-600">•</span>
-                      <span>{fact}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="mt-6 pt-4 border-t border-zinc-800/80 flex justify-between items-center text-[10px] uppercase font-bold text-zinc-500 group-hover:text-white transition-colors">
-                <span>INSPECT 3D MODEL</span>
-                <span>➔</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </main>
-
-      {/* 4. MODAL 3D MODEL VIEWERS */}
-      {activeTopic && (
-        <div className="fixed inset-0 z-[80] bg-black/90 backdrop-blur-xl flex flex-col items-center justify-center p-6">
-          
-          {/* Close Modal Button */}
-          <button
-            onClick={() => setActiveTopic(null)}
-            className="absolute top-8 right-8 z-50 px-5 py-2.5 bg-white text-black text-xs font-bold uppercase rounded-full hover:bg-zinc-200 transition-colors"
-          >
-            ✕ CLOSE VIEWER
-          </button>
-
-          {/* Model Title */}
-          <div className="absolute top-8 left-8 z-50">
-            <span className="text-xs text-zinc-500 uppercase font-mono">ACTIVE MODEL</span>
-            <h2 className="text-3xl font-black uppercase mt-1" style={{ color: activeTopic.color }}>
-              {activeTopic.title}
-            </h2>
+        {/* Bottom Model Selector Controls */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-6 pointer-events-auto">
+          <div className="flex gap-4">
+            {spaceTopics.map((topic) => (
+              <button
+                key={topic.id}
+                onClick={() => setActiveTopic(topic)}
+                className={`px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-full border backdrop-blur-md transition-all ${
+                  activeTopic.id === topic.id
+                    ? 'bg-white text-black border-white shadow-[0_0_25px_rgba(255,255,255,0.6)]'
+                    : 'bg-black/40 text-zinc-400 border-zinc-800 hover:border-zinc-500'
+                }`}
+              >
+                {topic.title}
+              </button>
+            ))}
           </div>
 
-          {/* 3D Canvas */}
-          <div className="w-full h-[70vh] max-w-5xl relative">
-            <Canvas camera={{ position: [0, 0, 6], fov: 45 }}>
-              <ambientLight intensity={1.5} />
-              <pointLight position={[10, 10, 10]} intensity={2} />
-              <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
-              <Suspense fallback={null}>
-                <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
-                  <SpaceModel path={activeTopic.modelPath} />
-                </Float>
-              </Suspense>
-              <OrbitControls enableZoom={true} autoRotate autoRotateSpeed={1.5} />
-            </Canvas>
-          </div>
-
-          <span className="text-xs text-zinc-500 uppercase tracking-widest mt-4 font-mono">
+          <span className="text-[10px] text-zinc-500 uppercase tracking-widest bg-black/60 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 font-mono">
             3D INTERACTIVE MODEL // DRAG TO ROTATE // SCROLL TO ZOOM
           </span>
         </div>
-      )}
+
+      </div>
 
     </div>
   );
